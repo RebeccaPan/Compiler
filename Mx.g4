@@ -1,4 +1,4 @@
-grammar Yx;
+grammar Mx;
 
 // reserved words
 BOOL: 'bool';
