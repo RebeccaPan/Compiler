@@ -95,12 +95,6 @@ primary
 
 exprList: expr (',' expr)*;
 
-/*
-className (dimension* ('(' ')')? );
-
-dimension : '[' expr? ']';
-*/
-
 creator: simpleType ('[' expr? ']')* ('(' ')')?;
 
 para: type ID;
