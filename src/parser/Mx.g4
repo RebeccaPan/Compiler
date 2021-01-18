@@ -104,6 +104,6 @@ paraList: para (',' para)*;
 simpleType: BOOL | INT | STRING | ID;
 
 type
-    : simpleType '[' ']'
+    : simpleType larr='[' ']'
     | simpleType
     ;

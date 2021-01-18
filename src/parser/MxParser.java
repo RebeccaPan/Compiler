@@ -2111,6 +2111,7 @@ public class MxParser extends Parser {
 	}
 
 	public static class TypeContext extends ParserRuleContext {
+		public Token larr;
 		public SimpleTypeContext simpleType() {
 			return getRuleContext(SimpleTypeContext.class,0);
 		}
@@ -2146,7 +2147,7 @@ public class MxParser extends Parser {
 				setState(254);
 				simpleType();
 				setState(255);
-				match(T__14);
+				((TypeContext)_localctx).larr = match(T__14);
 				setState(256);
 				match(T__15);
 				}
