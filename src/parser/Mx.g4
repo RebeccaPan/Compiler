@@ -34,7 +34,7 @@ literal: TRUE | FALSE | NUM | STR | NULL;
 WS: [ \t]+ -> skip;
 NEWLINE: ('\r' '\n'? | '\n') -> skip;
 // BLOCK_COMMENT: '/*' .*? '*/' -> skip;
-LINE_COMMENT: '//' ~[\r\n]*? -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
 
 // Top-down
 program: (def)* EOF;
@@ -95,7 +95,12 @@ primary
 
 exprList: expr (',' expr)*;
 
-creator: simpleType ('[' expr? ']')* ('(' ')')?;
+creator
+    : simpleType                                            #simpleCreator
+    | simpleType '(' ')'                                    #classCreator
+    | simpleType ('[' expr ']')+ ('[' ']')*                 #arrayCreator
+    | simpleType ('[' expr ']')+ ('[' ']')+ ('[' expr ']')  #wrongCreator
+    ;
 
 para: type ID;
 
@@ -104,6 +109,6 @@ paraList: para (',' para)*;
 simpleType: BOOL | INT | STRING | ID;
 
 type
-    : simpleType larr='[' ']'
+    : type larr='[' ']'
     | simpleType
     ;

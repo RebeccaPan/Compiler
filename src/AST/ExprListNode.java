@@ -3,10 +3,10 @@ package AST;
 import Util.LocationType;
 import Util.ScopeType;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ExprListNode extends ASTNode {
-    private List<ExprNode> exprList;
+    private ArrayList<ExprNode> exprList;
     public ExprListNode(ScopeType _scope, LocationType _location) {
         super(_scope, _location);
     }

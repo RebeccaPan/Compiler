@@ -3,11 +3,11 @@ package AST;
 import Util.LocationType;
 import Util.ScopeType;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ProgramNode extends ASTNode {
-    List<DefNode> defNodeList;
-    public ProgramNode(ScopeType _scope, LocationType _location, List<DefNode> _defNodeList) {
+    ArrayList<DefNode> defNodeList;
+    public ProgramNode(ScopeType _scope, LocationType _location, ArrayList<DefNode> _defNodeList) {
         super(_scope, _location);
         defNodeList = _defNodeList;
     }

@@ -4,11 +4,10 @@ import Util.LocationType;
 import Util.ScopeType;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class VarDefNode extends DefNode {
     private TypeNode type;
-    private List<SimpleVarDefNode> simpleVarDefList;
+    private ArrayList<SimpleVarDefNode> simpleVarDefList;
     public VarDefNode(ScopeType _scope, LocationType _location, TypeNode _type) {
         super(_scope, _location); type = _type;
         simpleVarDefList = new ArrayList<>();

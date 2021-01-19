@@ -5,7 +5,6 @@ import Util.LocationType;
 import Util.ScopeType;
 import parser.MxBaseVisitor;
 import parser.MxParser;
-
 import java.util.ArrayList;
 
 public class ASTBuilder extends MxBaseVisitor<ASTNode>{
@@ -26,56 +25,82 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     
 	@Override public ASTNode visitProgram(MxParser.ProgramContext ctx) {
 		// return ProgramNode
-		ArrayList<DefNode> DefNodes = new ArrayList<>();
+		ArrayList<DefNode> defList = new ArrayList<>();
 		for (var curDefNode : ctx.def()) {
-			ASTNode cur = visit(curDefNode);
-			DefNodes.add((DefNode) cur);
+			defList.add((DefNode) visit(curDefNode));
 		}
-        return new ProgramNode(new ScopeType(ctx), new LocationType(ctx), DefNodes);
+        return new ProgramNode(new ScopeType(ctx), new LocationType(ctx), defList);
     }
 	
     @Override public ASTNode visitSuite(MxParser.SuiteContext ctx) {
-        return visitChildren(ctx);
+		// return SuiteNode
+		ArrayList<StmtNode> stmtList = new ArrayList<>();
+		for (var curStmt : ctx.stmt()) {
+			stmtList.add((StmtNode) visit(curStmt));
+		}
+        return new SuiteNode(new ScopeType(ctx), new LocationType(ctx), stmtList);
     }
     
 	@Override public ASTNode visitBlockStmt(MxParser.BlockStmtContext ctx) {
-    	return visitChildren(ctx);
+    	return visit(ctx.suite());
     }
 
 	@Override public ASTNode visitVarDefStmt(MxParser.VarDefStmtContext ctx) {
-    	return visitChildren(ctx);
+    	return visit(ctx.varDef());
     }
 
 	@Override public ASTNode visitIfStmt(MxParser.IfStmtContext ctx) {
-    	return visitChildren(ctx);
+		// return IfStmtNode
+		return new IfStmtNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(StmtNode) visit(ctx.trueStmt),
+				(StmtNode) visit(ctx.falseStmt) );
     }
 
 	@Override public ASTNode visitForStmt(MxParser.ForStmtContext ctx) {
-    	return visitChildren(ctx);
+		// return ForStmtNode
+		return new ForStmtNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.init),
+				(ExprNode) visit(ctx.cond),
+				(StmtNode) visit(ctx.stmt()) );
     }
 
 	@Override public ASTNode visitWhileStmt(MxParser.WhileStmtContext ctx) {
-    	return visitChildren(ctx);
+		// return WhileStmtNode
+		return new WhileStmtNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.expr()),
+				(StmtNode) visit(ctx.stmt()) );
     }
 
 	@Override public ASTNode visitBreakStmt(MxParser.BreakStmtContext ctx) {
-    	return visitChildren(ctx);
+		// return BreakNode
+    	return new BreakNode(new ScopeType(ctx), new LocationType(ctx));
     }
 
 	@Override public ASTNode visitContinueStmt(MxParser.ContinueStmtContext ctx) {
-    	return visitChildren(ctx);
+		// return ContinueNode
+		return new ContinueNode(new ScopeType(ctx), new LocationType(ctx));
     }
 
 	@Override public ASTNode visitReturnStmt(MxParser.ReturnStmtContext ctx) {
-    	return visitChildren(ctx);
+		// // return ReturnNode
+    	if (ctx.expr() != null)
+    		return new ReturnNode(new ScopeType(ctx), new LocationType(ctx), (ExprNode) visit(ctx.expr()), true);
+    	else
+    		return new ReturnNode(new ScopeType(ctx), new LocationType(ctx), null, false);
     }
 
 	@Override public ASTNode visitExprStmt(MxParser.ExprStmtContext ctx) {
-    	return visitChildren(ctx);
+    	return visit(ctx.expr());
     }
 
 	@Override public ASTNode visitEmptyStmt(MxParser.EmptyStmtContext ctx) {
-    	return visitChildren(ctx);
+    	return null;
     }
 
 	@Override public ASTNode visitDef(MxParser.DefContext ctx) {
@@ -90,16 +115,13 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 	    // return ClassDefNode
 	    ClassDefNode ret = new ClassDefNode(new ScopeType(ctx), new LocationType(ctx), ctx.ID().getText());
 	    for (var curVarDef : ctx.varDef()) {
-	    	ASTNode cur = visit(curVarDef);
-	    	ret.addVarDef((VarDefNode) cur);
+	    	ret.addVarDef((VarDefNode) visit(curVarDef));
 	    }
 		for (var curFuncDef : ctx.funcDef()) {
-			ASTNode cur = visit(curFuncDef);
-			ret.addFuncDef((FuncDefNode) cur);
+			ret.addFuncDef((FuncDefNode) visit(curFuncDef));
 		}
 		for (var curConstructorDef : ctx.constructorDef()) {
-			ASTNode cur = visit(curConstructorDef);
-			ret.addConstructorDef((ConstructorDefNode) cur);
+			ret.addConstructorDef((ConstructorDefNode) visit(curConstructorDef));
 		}
     	return ret;
     }
@@ -119,8 +141,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 		// return VarDefNode
 		VarDefNode ret = new VarDefNode(new ScopeType(ctx), new LocationType(ctx), (TypeNode) visit(ctx.type()));
 		for (var curSimpleVarDef : ctx.simpleVarDef()) {
-			ASTNode cur = visit(curSimpleVarDef);
-			ret.addSimpleVarDef((SimpleVarDefNode) cur);
+			ret.addSimpleVarDef((SimpleVarDefNode) visit(curSimpleVarDef));
 		}
     	return ret;
     }
@@ -145,42 +166,79 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitNewExpr(MxParser.NewExprContext ctx) {
-    	return visitChildren(ctx);
+		return visit(ctx.creator());
     }
 
 	@Override public ASTNode visitPrefixExpr(MxParser.PrefixExprContext ctx) {
-    	return visitChildren(ctx);
+		// return PrefixExprNode
+		return new PrefixExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				ctx.op.getText(),
+				(ExprNode) visit(ctx.expr()) );
     }
 
 	@Override public ASTNode visitClassMemberExpr(MxParser.ClassMemberExprContext ctx) {
-    	return visitChildren(ctx);
+		// return ClassMemberExprNode
+		return new ClassMemberExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.expr()),
+				ctx.ID().getText() );
     }
 
 	@Override public ASTNode visitSubscriptExpr(MxParser.SubscriptExprContext ctx) {
-    	return visitChildren(ctx);
+		// return SubscriptExprNode
+		return new SubscriptExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.expr(0)),
+				(ExprNode) visit(ctx.expr(1)) );
     }
 
 	@Override public ASTNode visitAtomExpr(MxParser.AtomExprContext ctx) {
-    	return visitChildren(ctx);
+    	return visit(ctx.primary());
     }
 
 	@Override public ASTNode visitBinaryExpr(MxParser.BinaryExprContext ctx) {
-    	return visitChildren(ctx);
+		// return BinaryExprNode
+		return new BinaryExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				ctx.op.getText(),
+				(ExprNode) visit(ctx.expr(0)),
+				(ExprNode) visit(ctx.expr(1)) );
     }
 
 	@Override public ASTNode visitPostfixExpr(MxParser.PostfixExprContext ctx) {
-    	return visitChildren(ctx);
+		// return PostfixExprNode
+		return new PostfixExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				ctx.op.getText(),
+				(ExprNode) visit(ctx.expr()) );
     }
 
 	@Override public ASTNode visitAssignExpr(MxParser.AssignExprContext ctx) {
-    	return visitChildren(ctx);
+		// return AssignExprNode
+		return new AssignExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.expr(0)),
+				(ExprNode) visit(ctx.expr(1)) );
     }
 
 	@Override public ASTNode visitCallFuncExpr(MxParser.CallFuncExprContext ctx) {
-    	return visitChildren(ctx);
+		// return CallFuncExprNode
+    	return new CallFuncExprNode (
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(ExprNode) visit(ctx.expr()),
+				(ctx.exprList() != null) ? (ExprListNode) visit(ctx.exprList()) : null );
     }
 
 	@Override public ASTNode visitPrimary(MxParser.PrimaryContext ctx) {
+		// expr or return ThisNode or return IDNode or literal
 		if (ctx.expr() != null)
 			return visit(ctx.expr());
 		if (ctx.THIS() != null)
@@ -202,10 +260,48 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 		return ret;
 	}
 
-	// TODO
-	@Override public ASTNode visitCreator(MxParser.CreatorContext ctx) {
-		// return CreatorNode
-		return visitChildren(ctx);
+	@Override public ASTNode visitSimpleCreator(MxParser.SimpleCreatorContext ctx) {
+		// return NewExprNode
+		return new NewExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(SimpleTypeNode) visit(ctx.simpleType()),
+				null,
+				0 );
+	}
+
+	@Override public ASTNode visitClassCreator(MxParser.ClassCreatorContext ctx) {
+		// return NewExprNode
+		return new NewExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(SimpleTypeNode) visit(ctx.simpleType()),
+				null,
+				0 );
+	}
+
+	@Override public ASTNode visitArrayCreator(MxParser.ArrayCreatorContext ctx) {
+		// return NewExprNode
+		ArrayList<ExprNode> retExprList = new ArrayList<>();
+		for (var curExpr : ctx.expr()) {
+			ASTNode cur = visit(curExpr);
+			retExprList.add((ExprNode) cur);
+		}
+		int retDim = 0;
+		for (var cur : ctx.children) {
+			if (cur.getText().equals("[")) retDim++;
+		}
+		return new NewExprNode(
+				new ScopeType(ctx),
+				new LocationType(ctx),
+				(SimpleTypeNode) visit(ctx.simpleType()),
+				retExprList,
+				retDim );
+	}
+
+	@Override public ASTNode visitWrongCreator(MxParser.WrongCreatorContext ctx) {
+		// TODO: throw error
+		return null;
 	}
 
 	@Override public ASTNode visitPara(MxParser.ParaContext ctx) {
@@ -214,8 +310,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 				new ScopeType(ctx),
 				new LocationType(ctx),
 				(TypeNode) visit(ctx.type()),
-				ctx.ID().getText()
-		);
+				ctx.ID().getText() );
 	}
 
 	@Override public ASTNode visitParaList(MxParser.ParaListContext ctx) {
@@ -242,11 +337,11 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 	}
 
 	@Override public ASTNode visitType(MxParser.TypeContext ctx) {
+		// return TypeNode
 		return new TypeNode(
 				new ScopeType(ctx),
 				new LocationType(ctx),
 				(SimpleTypeNode) visit(ctx.simpleType()),
-				ctx.larr != null
-		);
+				ctx.larr != null );
 	}
 }

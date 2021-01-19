@@ -346,15 +346,53 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitExprList(MxParser.ExprListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MxParser#creator}.
+	 * Enter a parse tree produced by the {@code simpleCreator}
+	 * labeled alternative in {@link MxParser#creator}.
 	 * @param ctx the parse tree
 	 */
-	void enterCreator(MxParser.CreatorContext ctx);
+	void enterSimpleCreator(MxParser.SimpleCreatorContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MxParser#creator}.
+	 * Exit a parse tree produced by the {@code simpleCreator}
+	 * labeled alternative in {@link MxParser#creator}.
 	 * @param ctx the parse tree
 	 */
-	void exitCreator(MxParser.CreatorContext ctx);
+	void exitSimpleCreator(MxParser.SimpleCreatorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code classCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassCreator(MxParser.ClassCreatorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code classCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassCreator(MxParser.ClassCreatorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code arrayCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayCreator(MxParser.ArrayCreatorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arrayCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayCreator(MxParser.ArrayCreatorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code wrongCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void enterWrongCreator(MxParser.WrongCreatorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code wrongCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void exitWrongCreator(MxParser.WrongCreatorContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#para}.
 	 * @param ctx the parse tree

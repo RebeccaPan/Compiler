@@ -10,6 +10,7 @@ public class SimpleTypeNode extends ASTNode {
         super(_scope, _location);
         type = _type; isClassType = _isClassType;
     }
+    public String getType() { return type; }
     @Override
     public void accept(ASTVisitor visitor) { visitor.visit(this); }
 }

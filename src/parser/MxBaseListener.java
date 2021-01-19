@@ -376,13 +376,49 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCreator(MxParser.CreatorContext ctx) { }
+	@Override public void enterSimpleCreator(MxParser.SimpleCreatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCreator(MxParser.CreatorContext ctx) { }
+	@Override public void exitSimpleCreator(MxParser.SimpleCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterClassCreator(MxParser.ClassCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassCreator(MxParser.ClassCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayCreator(MxParser.ArrayCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayCreator(MxParser.ArrayCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterWrongCreator(MxParser.WrongCreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitWrongCreator(MxParser.WrongCreatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

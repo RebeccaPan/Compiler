@@ -3,10 +3,10 @@ package AST;
 import Util.LocationType;
 import Util.ScopeType;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ParaListNode extends ASTNode {
-    private List<ParaNode> paraList;
+    private ArrayList<ParaNode> paraList;
     public ParaListNode (ScopeType _scope, LocationType _location) {
         super(_scope, _location);
     }
