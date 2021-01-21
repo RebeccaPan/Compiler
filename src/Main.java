@@ -1,6 +1,5 @@
 import AST.*;
-import frontend.ASTBuilder;
-import frontend.SemanticChecker;
+import frontend.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parser.*;
@@ -11,9 +10,10 @@ import java.io.InputStream;
 public class Main {
     public static void main(String[] args) throws Exception {
         // change relative address here:
-        String filename = "./testcase/sema/basic-package/basic-3.mx";
+        // String filename = "./testcase/sema/misc-package/misc-27.mx";
         try {
-            InputStream file = new FileInputStream(filename);
+            // InputStream file = new FileInputStream(filename);
+            InputStream file = System.in;
             ProgramNode ast = BuildAST(file);
             new SemanticChecker().visit(ast);
         } catch (Exception err) {

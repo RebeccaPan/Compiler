@@ -8,6 +8,7 @@ public class ParaListNode extends ASTNode {
     private ArrayList<ParaNode> paraList;
     public ParaListNode (LocationType _location) {
         super(_location);
+        paraList = new ArrayList<ParaNode>();
     }
     public void add(ParaNode para) { paraList.add(para); }
     public ArrayList<ParaNode> getParaList() { return paraList; }

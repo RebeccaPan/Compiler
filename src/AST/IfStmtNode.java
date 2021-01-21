@@ -4,16 +4,16 @@ import Util.LocationType;
 
 public class IfStmtNode extends StmtNode {
     private ExprNode cond;
-    private StmtNode trueStmt, falseStmt;
-    public IfStmtNode (LocationType _location, ExprNode _cond, StmtNode _trueStmt, StmtNode _falseStmt) {
+    private SuiteNode trueSuite, falseSuite;
+    public IfStmtNode (LocationType _location, ExprNode _cond, SuiteNode _trueSuite, SuiteNode _falseSuite) {
         super(_location);
         cond = _cond;
-        trueStmt = _trueStmt;
-        falseStmt = _falseStmt;
+        trueSuite = _trueSuite;
+        falseSuite = _falseSuite;
     }
     public ExprNode getCond() { return cond; }
-    public StmtNode getTrueStmt() { return trueStmt; }
-    public StmtNode getFalseStmt() { return falseStmt; }
+    public SuiteNode getTrueSuite() { return trueSuite; }
+    public SuiteNode getFalseSuite() { return falseSuite; }
 
     @Override
     public void accept(ASTVisitor visitor) { visitor.visit(this); }

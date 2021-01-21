@@ -26,7 +26,7 @@ THIS: 'this';
 NUM : [1-9][0-9]* | '0';
 ESC : '\\n' | '\\\\' | '\\"';
 STR : '"' (ESC|.)*? '"';
-ID: [a-zA-Z_][a-zA-Z_0-9]*;
+ID: [a-zA-Z][a-zA-Z_0-9]*;
 
 literal: TRUE | FALSE | NUM | STR | NULL;
 
@@ -42,16 +42,16 @@ program: (def)* EOF;
 suite: '{' stmt* '}';
 
 stmt
-    : suite                                                    #blockStmt
-    | varDef                                                   #varDefStmt
-    | IF '(' expr ')' trueStmt=stmt (ELSE falseStmt=stmt)?     #ifStmt
-    | FOR '(' init=expr ';' cond=expr ';' step=expr ')' stmt?  #forStmt
-    | WHILE '(' expr ')' stmt                                  #whileStmt
-    | BREAK ';'                                                #breakStmt
-    | CONTINUE ';'                                             #continueStmt
-    | RETURN expr? ';'                                         #returnStmt
-    | expr ';'                                                 #exprStmt
-    | ';'                                                      #emptyStmt
+    : suite                                                             #blockStmt
+    | varDef                                                            #varDefStmt
+    | IF '(' expr? ')' (trueStmt=stmt)? (ELSE falseStmt=stmt)?          #ifStmt
+    | FOR '(' (init=expr)? ';' (cond=expr)? ';' (step=expr)? ')' stmt?  #forStmt
+    | WHILE '(' expr ')' stmt                                           #whileStmt
+    | BREAK ';'                                                         #breakStmt
+    | CONTINUE ';'                                                      #continueStmt
+    | RETURN expr? ';'                                                  #returnStmt
+    | expr ';'                                                          #exprStmt
+    | ';'                                                               #emptyStmt
     ;
 
 def: classDef | funcDef | varDef;
@@ -69,13 +69,13 @@ constructorDef: ID '(' paraList? ')' suite;
 expr
     : primary                                                  #atomExpr
     | expr op=('++' | '--')                                    #postfixExpr
-    | <assoc=right> op=('++' | '--') expr                      #prefixExpr
-    | <assoc=right> op=( '+' | '-' ) expr                      #prefixExpr
-    | <assoc=right> op=( '!' | '~' ) expr                      #prefixExpr
     | <assoc=right> NEW creator                                #newExpr
     | expr '.' ID                                              #classMemberExpr
     | expr '(' exprList? ')'                                   #callFuncExpr
     | expr '[' expr ']'                                        #subscriptExpr
+    | <assoc=right> op=('++' | '--') expr                      #prefixExpr
+    | <assoc=right> op=( '+' | '-' ) expr                      #prefixExpr
+    | <assoc=right> op=( '!' | '~' ) expr                      #prefixExpr
     | expr op=('*' | '/' | '%') expr                           #binaryExpr
     | expr op=('+' | '-') expr                                 #binaryExpr
     | expr op=('<<' | '>>') expr                               #binaryExpr

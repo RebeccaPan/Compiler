@@ -12,4 +12,5 @@ public class LocationType {
     public LocationType(ParserRuleContext ctx) { this(ctx.start); }
     public int getLn() { return ln; }
     public int getCol() { return col; }
+    public String toString() { return getLn() + " " + getCol(); }
 }

@@ -41,6 +41,8 @@ public class LocalScope implements ScopeType {
         funcMap.put(cur.getID(), cur);
     }
 
+    public void addConstructor (FuncSymbol cur) { funcMap.put(cur.getID(), cur); }
+
     @Override public void addClass(ClassSymbol cur) {
         throw new CompilationError("ClassSymbol: " + cur.getID() + " addClass in Local Scope");
     }
@@ -61,5 +63,10 @@ public class LocalScope implements ScopeType {
         if (varMap.containsKey(ID)) return varMap.get(ID);
         if (funcMap.containsKey(ID)) return funcMap.get(ID);
         return outerScope().findSymbol(ID);
+    }
+
+    @Override
+    public ClassSymbol findClassSymbol(String ID) {
+        return outerScope().findClassSymbol(ID);
     }
 }

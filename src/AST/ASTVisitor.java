@@ -1,7 +1,5 @@
 package AST;
 
-import java.net.IDN;
-
 public interface ASTVisitor {
     void visit(BoolLiteralNode node);
     void visit(IntLiteralNode node);
@@ -22,7 +20,6 @@ public interface ASTVisitor {
     void visit(ParaListNode node);
     void visit(ParaNode node);
 
-//    void visit(ExprNode node);
     void visit(ExprListNode node);
     void visit(NewExprNode node);
 
@@ -45,5 +42,6 @@ public interface ASTVisitor {
 
     void visit(ThisNode node);
     void visit(IDNode node);
+    void visit(EmptyNode node);
     void visit(SimpleVarDefNode node);
 }

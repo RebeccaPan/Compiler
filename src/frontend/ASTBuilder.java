@@ -52,29 +52,39 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 
 	@Override public ASTNode visitIfStmt(MxParser.IfStmtContext ctx) {
 		// return IfStmtNode
+		ArrayList<StmtNode> retTrueList = new ArrayList<>();
+		if (ctx.trueStmt != null)
+			retTrueList.add((StmtNode) visit(ctx.trueStmt));
+		SuiteNode retTrueSuite = new SuiteNode(new LocationType(ctx), retTrueList);
+		ArrayList<StmtNode> retFalseList = new ArrayList<>();
+		if (ctx.falseStmt != null)
+			retFalseList.add((StmtNode) visit(ctx.falseStmt));
+		SuiteNode retFalseSuite = new SuiteNode(new LocationType(ctx), retFalseList);
 		return new IfStmtNode(
 				new LocationType(ctx),
-				(ExprNode) visit(ctx.expr()),
-				(StmtNode) visit(ctx.trueStmt),
-				(StmtNode) visit(ctx.falseStmt) );
+				(ctx.expr() == null) ? new BoolLiteralNode(new LocationType(ctx), true) : (ExprNode) visit(ctx.expr()),
+				retTrueSuite, retFalseSuite );
     }
 
 	@Override public ASTNode visitForStmt(MxParser.ForStmtContext ctx) {
 		// return ForStmtNode
+		ArrayList<StmtNode> retList = new ArrayList<>();
+		retList.add((StmtNode) visit(ctx.stmt()));
+		SuiteNode retSuite = new SuiteNode(new LocationType(ctx), retList);
 		return new ForStmtNode(
 				new LocationType(ctx),
-				(ExprNode) visit(ctx.init),
-				(ExprNode) visit(ctx.cond),
-				(ExprNode) visit(ctx.step),
-				(StmtNode) visit(ctx.stmt()) );
+				(ctx.init == null) ? null : (ExprNode) visit(ctx.init),
+				(ctx.cond == null) ? null : (ExprNode) visit(ctx.cond),
+				(ctx.step == null) ? null : (ExprNode) visit(ctx.step),
+				retSuite );
     }
 
 	@Override public ASTNode visitWhileStmt(MxParser.WhileStmtContext ctx) {
 		// return WhileStmtNode
-		return new WhileStmtNode(
-				new LocationType(ctx),
-				(ExprNode) visit(ctx.expr()),
-				(StmtNode) visit(ctx.stmt()) );
+		ArrayList<StmtNode> retList = new ArrayList<>();
+		retList.add((StmtNode) visit(ctx.stmt()));
+		SuiteNode retSuite = new SuiteNode(new LocationType(ctx), retList);
+		return new WhileStmtNode(new LocationType(ctx), (ExprNode) visit(ctx.expr()), retSuite);
     }
 
 	@Override public ASTNode visitBreakStmt(MxParser.BreakStmtContext ctx) {
@@ -100,7 +110,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitEmptyStmt(MxParser.EmptyStmtContext ctx) {
-    	return null;
+    	return new EmptyNode(new LocationType(ctx));
     }
 
 	@Override public ASTNode visitDef(MxParser.DefContext ctx) {

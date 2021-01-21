@@ -78,7 +78,7 @@ public class SemanticChecker implements ASTVisitor {
         PrintLn.setScope(PrintLnScope);
         curScope.addFunc(PrintLn);
 
-        FuncSymbol GetStr = new FuncSymbol("getStr", new LocalScope(curScope), new StringType(), virtualLoc);
+        FuncSymbol GetStr = new FuncSymbol("getString", new LocalScope(curScope), new StringType(), virtualLoc);
         curScope.addFunc(GetStr);
 
         // PrintInt & PrintLnInt with VarSymbol IntPrintLn in local scope
@@ -89,7 +89,7 @@ public class SemanticChecker implements ASTVisitor {
         PrintInt.setScope(PrintIntScope);
         curScope.addFunc(PrintInt);
 
-        FuncSymbol PrintIntLn = new FuncSymbol("println", new LocalScope(curScope), new VoidType(), virtualLoc);
+        FuncSymbol PrintIntLn = new FuncSymbol("printlnInt", new LocalScope(curScope), new VoidType(), virtualLoc);
         LocalScope PrintIntLnScope = new LocalScope(curScope);
         VarSymbol IntPrintLn = new VarSymbol("num", PrintIntLnScope, new IntType(), virtualLoc);
         PrintIntLnScope.addVar(IntPrintLn);
@@ -137,7 +137,7 @@ public class SemanticChecker implements ASTVisitor {
                     throw new CompilationError("Semantic - class name as main", curNode.getLocation());
                 ClassSymbol classSymbol = new ClassSymbol(
                         ((ClassDefNode) curNode).getClassID(),
-                        curNode.getScope(),
+                        new LocalScope(curScope),
                         new ClassType(((ClassDefNode) curNode).getClassID()),
                         curNode.getLocation() );
                 // add info of curClass(Symbol) in curScope
@@ -152,6 +152,7 @@ public class SemanticChecker implements ASTVisitor {
         for (var cur : node.getDefNodeList()) {
             if (cur instanceof ClassDefNode) {
                 ClassDefNode classDefNode = (ClassDefNode) cur;
+                curScope = classDefNode.getScope();
                 classDefNode.getVarDefList().forEach(x -> x.accept(this));
                 for (FuncDefNode curNode : classDefNode.getFuncDefList()) {
                     FuncSymbol funcSymbol = new FuncSymbol(
@@ -159,14 +160,16 @@ public class SemanticChecker implements ASTVisitor {
                             new LocalScope(curScope),
                             null,
                             curNode.getLocation() );
+                    curScope.addFunc(funcSymbol);
                     Type type = curScope.findSymbol(curNode.getType().getSimpleTypeNode().getType()).getType();
-                    funcSymbol.setType( (type.getDim() == 0) ? type : new ArrayType(type, type.getDim()) );
+                    funcSymbol.setType( (curNode.getType().getDim() == 0) ? type : new ArrayType(type, curNode.getType().getDim()) );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(funcSymbol.getScope());
                     curNode.setFuncSymbol(funcSymbol);
                     // visit para
                     curScope = curNode.getScope();
-                    curNode.getParaList().getParaList().forEach(x -> x.accept(this));
+                    if (curNode.getParaList() != null)
+                        curNode.getParaList().getParaList().forEach(x -> x.accept(this));
                     curScope = curNode.getScope().outerScope();
                     if (curNode.getFuncID().equals(classDefNode.getClassID()))
                         throw new CompilationError("Semantic - funcID same as classID in class", node.getLocation());
@@ -179,14 +182,16 @@ public class SemanticChecker implements ASTVisitor {
                     FuncSymbol constructorSymbol = new FuncSymbol(
                             curNode.getFuncID(),
                             new LocalScope(curScope),
-                            null,
+                            new VoidType(),
                             curNode.getLocation() );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curNode.setFuncSymbol(constructorSymbol);
+                    ((LocalScope)curScope).addConstructor(constructorSymbol);
                     // visit para
                     curScope = curNode.getScope();
-                    curNode.getParaList().getParaList().forEach(x -> x.accept(this));
+                    if (curNode.getParaList() != null)
+                        curNode.getParaList().getParaList().forEach(x -> x.accept(this));
                     curScope = curNode.getScope().outerScope();
                 }
                 if (!haveConstructor) { // create default constructor which does nothing
@@ -199,8 +204,12 @@ public class SemanticChecker implements ASTVisitor {
                             classDefNode.getLocation() );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
+                    curScope = constructorSymbol.getScope();
                     curNode.setFuncSymbol(constructorSymbol);
+                    ((LocalScope)curScope).addConstructor(constructorSymbol);
+                    curScope = curScope.outerScope();
                 }
+                curScope = curScope.outerScope();
             }
         }
 
@@ -210,6 +219,8 @@ public class SemanticChecker implements ASTVisitor {
             if (curNode instanceof FuncDefNode) {
                 if (((FuncDefNode) curNode).getFuncID().equals("main")) {
                     if (mainFuncFound) throw new CompilationError("Semantic - multiple main func", curNode.getLocation());
+                    if (((FuncDefNode) curNode).getParaList() != null) throw new CompilationError("Semantic - main func paraList no empty", curNode.getLocation());
+                    if (((FuncDefNode) curNode).getType().getSimpleTypeNode().getType() != "int") throw new CompilationError("Semantic - main func type should be int", curNode.getLocation());
                     else mainFuncFound = true;
                 }
                 // add info of curFunc(Symbol) in curScope
@@ -218,9 +229,9 @@ public class SemanticChecker implements ASTVisitor {
                         new LocalScope(curScope),
                         null,
                         curNode.getLocation() );
-                Type type = curScope.findSymbol(((FuncDefNode) curNode).getType().getSimpleTypeNode().getType()).getType();
-                funcSymbol.setType( (type.getDim() == 0) ? type : new ArrayType(type, type.getDim()) );
                 curScope.addFunc(funcSymbol);
+                Type type = curScope.findSymbol(((FuncDefNode) curNode).getType().getSimpleTypeNode().getType()).getType();
+                funcSymbol.setType( (((FuncDefNode) curNode).getType().getDim() == 0) ? type : new ArrayType(type, ((FuncDefNode) curNode).getType().getDim()) );
                 // set scope & funcSymbol of curNode
                 curNode.setScope(funcSymbol.getScope());
                 ((FuncDefNode) curNode).setFuncSymbol(funcSymbol);
@@ -307,7 +318,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(SimpleVarDefNode node) {
         String typeStr = node.getType().getSimpleTypeNode().getType();
         int dim = node.getType().getDim();
-        Type type, baseType = curScope.findSymbol(typeStr).getType();
+        Type type, baseType = curScope.findClassSymbol(typeStr).getType();
         if (dim == 0)
             type = baseType;
         else
@@ -341,8 +352,19 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(ParaNode node) {
-        if (!curScope.existID(node.getParaID()))
-            throw new CompilationError("Semantic - paraID not found in scope", node.getLocation());
+        String typeStr = node.getType().getSimpleTypeNode().getType();
+        int dim = node.getType().getDim();
+        Type type, baseType = curScope.findSymbol(typeStr).getType();
+        if (dim == 0)
+            type = baseType;
+        else
+            type = new ArrayType(baseType, dim);
+        VarSymbol varSymbol = new VarSymbol(node.getParaID(), curScope, type, node.getLocation());
+        curScope.addVar(varSymbol);
+        node.setScope(curScope);
+        node.setVarSymbol(varSymbol);
+//        if (!curScope.existID(node.getParaID()))
+//            throw new CompilationError("Semantic - paraID not found in scope", node.getLocation());
     }
 
     @Override
@@ -360,7 +382,7 @@ public class SemanticChecker implements ASTVisitor {
             new IntType().assignable(cur.getType(), cur.getLocation());
             cur.assertIsVal(node.getLocation());
         }
-        Type type = curScope.findSymbol(node.getSimpleType().getType()).getType();
+        Type type = curScope.findClassSymbol(node.getSimpleType().getType()).getType();
         int dim = node.getDim();
         node.setType((dim == 0) ? type : new ArrayType(type, dim));
         node.setExprCat(ExprNode.ExprCat.RVal);
@@ -386,15 +408,18 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(IfStmtNode node) {
         node.setScope(curScope);
-        node.getCond().accept(this);
-        if (node.getCond().getExprCat() == ExprNode.ExprCat.Class)
-            throw new CompilationError("Semantic - if stmt cond with type as class");
-        if (node.getCond().getExprCat() == ExprNode.ExprCat.Func)
-            throw new CompilationError("Semantic - if stmt cond with type as func");
-        new BoolType().assignable(node.getCond().getType(), node.getCond().getLocation());
-        node.getTrueStmt().accept(this);
-        if (node.getFalseStmt() != null)
-            node.getFalseStmt().accept(this);
+        if (node.getCond() != null) {
+            node.getCond().accept(this);
+            if (node.getCond().getExprCat() == ExprNode.ExprCat.Class)
+                throw new CompilationError("Semantic - if stmt cond with type as class");
+            if (node.getCond().getExprCat() == ExprNode.ExprCat.Func)
+                throw new CompilationError("Semantic - if stmt cond with type as func");
+            new BoolType().assignable(node.getCond().getType(), node.getCond().getLocation());
+        }
+        if (node.getTrueSuite() != null)
+            node.getTrueSuite().accept(this);
+        if (node.getFalseSuite() != null)
+            node.getFalseSuite().accept(this);
     }
 
     @Override
@@ -417,7 +442,8 @@ public class SemanticChecker implements ASTVisitor {
         }
         if (node.getStep() != null)
             node.getStep().accept(this);
-        node.getStmt().accept(this);
+        if (node.getSuite() != null)
+            node.getSuite().accept(this);
         curLoop = tempLoop;
     }
 
@@ -432,7 +458,7 @@ public class SemanticChecker implements ASTVisitor {
         if (node.getExpr().getExprCat() == ExprNode.ExprCat.Func)
             throw new CompilationError("Semantic - for stmt cond with type as func");
         new BoolType().assignable(node.getExpr().getType(), node.getExpr().getLocation());
-        node.getStmt().accept(this);
+        node.getSuite().accept(this);
         curLoop = tempLoop;
     }
 
@@ -458,13 +484,15 @@ public class SemanticChecker implements ASTVisitor {
             throw new CompilationError("Semantic - return found outside func", node.getLocation());
         node.setScope(curScope);
         node.setFuncSymbol(curFunc);
-        if (node.isWithRet()) {
+        if (!(node.isWithRet()) && !(node.getFuncSymbol().getType() instanceof VoidType)) {
+            throw new CompilationError("Semantic - return without val found in non-void func", node.getLocation());
+        }
+        else if(node.isWithRet()){
             if (node.getFuncSymbol().getType() instanceof VoidType)
                 throw new CompilationError("Semantic - return with val found in void func", node.getLocation());
-        }
-        else {
-            if (!(node.getFuncSymbol().getType() instanceof VoidType))
-                throw new CompilationError("Semantic - return without val found in non-void func", node.getLocation());
+            node.getRetExpr().accept(this);
+            node.getRetExpr().assertIsVal(node.getLocation());
+            curFunc.getType().assignable(node.getRetExpr().getType(), node.getLocation());
         }
     }
 
@@ -477,18 +505,20 @@ public class SemanticChecker implements ASTVisitor {
         if (op.equals("+") || op.equals("-") || op.equals("~")) {
             new IntType().assignable(node.getExpr().getType(), node.getLocation());
             node.setType(new IntType());
+            node.setExprCat(ExprNode.ExprCat.RVal);
         }
         if (op.equals("++") || op.equals("--")) {
             if (node.getExpr().getExprCat() != ExprNode.ExprCat.LVal)
                 throw new CompilationError("Semantic - prefix ++/-- found with non-LVal", node.getLocation());
             new IntType().assignable(node.getExpr().getType(), node.getLocation());
             node.setType(new IntType());
+            node.setExprCat(ExprNode.ExprCat.LVal);
         }
         if (op.equals("!")) {
             new BoolType().assignable(node.getExpr().getType(), node.getLocation());
             node.setType(new BoolType());
+            node.setExprCat(ExprNode.ExprCat.RVal);
         }
-        node.setExprCat(ExprNode.ExprCat.RVal);
     }
 
     @Override
@@ -508,8 +538,8 @@ public class SemanticChecker implements ASTVisitor {
         node.setScope(curScope);
         node.getExpr().accept(this);
         node.getExpr().assertIsVal(node.getLocation());
-        if (node.getExpr().getType() instanceof ClassType) {
-            ClassSymbol classSymbol = (ClassSymbol) curScope.findSymbol(node.getExpr().getType().getType());
+        if (node.getExpr().getType() instanceof ClassType || node.getExpr().getType() instanceof StringType) {
+            ClassSymbol classSymbol = curScope.findClassSymbol(node.getExpr().getType().getType());
             Symbol symbol = classSymbol.getScope().findSymbol(node.getID());
             node.setType(symbol.getType());
             node.setSymbol(symbol);
@@ -573,7 +603,7 @@ public class SemanticChecker implements ASTVisitor {
             throw new CompilationError("Semantic - subscript related index type error", node.getLocation());
         node.setExprCat(ExprNode.ExprCat.LVal);
         node.setType((arrayType.getDim() == 1) ?
-                arrayType.getBaseType() : new ArrayType(arrayType.getBaseType(), arrayType.getDim()));
+                arrayType.getBaseType() : new ArrayType(arrayType.getBaseType(), arrayType.getDim() - 1));
     }
 
     @Override
@@ -597,8 +627,8 @@ public class SemanticChecker implements ASTVisitor {
             else throw new CompilationError("Semantic - binary add type error", node.getLocation());
         }
         if (op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=")) {
-            if (lhs.getType() instanceof IntType && rhs.getType() instanceof IntType) node.setType(new IntType());
-            else if (lhs.getType() instanceof StringType && rhs.getType() instanceof StringType) node.setType(new StringType());
+            if (lhs.getType() instanceof IntType && rhs.getType() instanceof IntType) node.setType(new BoolType());
+            else if (lhs.getType() instanceof StringType && rhs.getType() instanceof StringType) node.setType(new BoolType());
             else throw new CompilationError("Semantic - binary compare type error", node.getLocation());
         }
         if (op.equals("==") || op.equals("!=")) {
@@ -623,7 +653,7 @@ public class SemanticChecker implements ASTVisitor {
             throw new CompilationError("Semantic - assign to non-LVal", node.getLocation());
         lhs.getType().assignable(rhs.getType(), node.getLocation());
         node.setType(lhs.getType());
-        node.setExprCat(ExprNode.ExprCat.RVal);
+        node.setExprCat(ExprNode.ExprCat.LVal);
     }
 
     @Override
@@ -654,6 +684,11 @@ public class SemanticChecker implements ASTVisitor {
             node.setExprCat(ExprNode.ExprCat.LVal);
         }
         else throw new CompilationError("Semantic - IDNode not as class, func or var", node.getLocation());
+    }
+
+    @Override
+    public void visit(EmptyNode node) {
+        // Do nothing
     }
 }
 

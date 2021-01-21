@@ -19,11 +19,20 @@ public class GlobalScope implements ScopeType {
 
     @Override public ScopeType outerScope() { return null; }
 
-    @Override public void addVar(VarSymbol cur) { varMap.put(cur.getID(), cur); }
+    @Override public void addVar(VarSymbol cur) {
+        assertNotExistID(cur.getID());
+        varMap.put(cur.getID(), cur);
+    }
 
-    @Override public void addFunc(FuncSymbol cur) { funcMap.put(cur.getID(), cur); }
+    @Override public void addFunc(FuncSymbol cur) {
+        assertNotExistID(cur.getID());
+        funcMap.put(cur.getID(), cur);
+    }
 
-    @Override public void addClass(ClassSymbol cur) { classMap.put(cur.getID(), cur); }
+    @Override public void addClass(ClassSymbol cur) {
+        assertNotExistID(cur.getID());
+        classMap.put(cur.getID(), cur);
+    }
 
     public Map<String, ClassSymbol> getClassMap() { return classMap; }
 
@@ -40,6 +49,12 @@ public class GlobalScope implements ScopeType {
     public Symbol findSymbol(String ID) {
         if (varMap.containsKey(ID)) return varMap.get(ID);
         if (funcMap.containsKey(ID)) return funcMap.get(ID);
+        if (classMap.containsKey(ID)) return classMap.get(ID);
+        throw new CompilationError("Symbol: " + ID + " not found (in Global Scope)");
+    }
+
+    @Override
+    public ClassSymbol findClassSymbol(String ID) {
         if (classMap.containsKey(ID)) return classMap.get(ID);
         throw new CompilationError("Symbol: " + ID + " not found (in Global Scope)");
     }

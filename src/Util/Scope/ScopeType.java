@@ -10,4 +10,5 @@ public interface ScopeType {
     boolean existID(String ID);
     void assertNotExistID(String ID);
     Symbol findSymbol(String ID);
+    ClassSymbol findClassSymbol(String ID);
 }

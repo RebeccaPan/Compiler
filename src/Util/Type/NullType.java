@@ -16,6 +16,7 @@ public class NullType implements Type {
 
     @Override
     public void comparable(Type otherType, LocationType location) {
+        if (otherType.getType().equals("null")) return;
         throw new CompilationError("Null Type not comparable with " + otherType.getType(), location);
     }
 }
