@@ -46,7 +46,7 @@ stmt
     | varDef                                                   #varDefStmt
     | IF '(' expr ')' trueStmt=stmt (ELSE falseStmt=stmt)?     #ifStmt
     | FOR '(' init=expr ';' cond=expr ';' step=expr ')' stmt?  #forStmt
-    | WHILE '(' expr ')' stmt?                                 #whileStmt
+    | WHILE '(' expr ')' stmt                                  #whileStmt
     | BREAK ';'                                                #breakStmt
     | CONTINUE ';'                                             #continueStmt
     | RETURN expr? ';'                                         #returnStmt
@@ -109,6 +109,6 @@ paraList: para (',' para)*;
 simpleType: BOOL | INT | STRING | ID;
 
 type
-    : type larr='[' ']'
+    : simpleType ('[' ']')+
     | simpleType
     ;

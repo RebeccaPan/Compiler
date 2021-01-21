@@ -2,11 +2,11 @@ package AST;
 
 import Util.*;
 
-public class StrLiteralNode extends ASTNode {
+public class StrLiteralNode extends ExprNode {
     private String val;
     // constructor
-    public StrLiteralNode(ScopeType _scope, LocationType _location, String _val) {
-        super(_scope, _location);
+    public StrLiteralNode(LocationType _location, String _val) {
+        super(_location);
         this.val = _val;
     }
     public String getVal() { return val; }

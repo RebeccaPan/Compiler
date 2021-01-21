@@ -5,8 +5,8 @@ import Util.*;
 public class BoolLiteralNode extends ExprNode {
     private boolean val;
     // constructor
-    public BoolLiteralNode(ScopeType _scope, LocationType _location, boolean _val) {
-        super(_scope, _location);
+    public BoolLiteralNode(LocationType _location, boolean _val) {
+        super(_location);
         this.val = _val;
     }
     public boolean getVal() { return val; }

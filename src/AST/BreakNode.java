@@ -1,12 +1,15 @@
 package AST;
 
 import Util.LocationType;
-import Util.ScopeType;
 
 public class BreakNode extends StmtNode {
-    public BreakNode(ScopeType _scope, LocationType _location) {
-        super(_scope, _location);
+    private ASTNode next;
+    public BreakNode(LocationType _location) {
+        super(_location);
     }
+    public ASTNode getNext() { return next; }
+    public void setNext(ASTNode next) { this.next = next; }
+
     @Override
     public void accept(ASTVisitor visitor) { visitor.visit(this); }
 }

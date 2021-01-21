@@ -2,11 +2,11 @@ package AST;
 
 import Util.*;
 
-public class IntLiteralNode extends ASTNode {
+public class IntLiteralNode extends ExprNode {
     private int val;
     // constructor
-    public IntLiteralNode(ScopeType _scope, LocationType _location, int _val) {
-        super(_scope, _location);
+    public IntLiteralNode(LocationType _location, int _val) {
+        super(_location);
         this.val = _val;
     }
     public int getVal() { return val; }

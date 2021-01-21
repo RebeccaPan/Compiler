@@ -21,20 +21,23 @@ public interface ASTVisitor {
     void visit(ParaListNode node);
     void visit(ParaNode node);
 
-    void visit(ExprNode node);
+//    void visit(ExprNode node);
     void visit(ExprListNode node);
     void visit(NewExprNode node);
 
     void visit(SuiteNode node);
-    void visit(StmtNode node);
+//    void visit(StmtNode node);
     void visit(IfStmtNode node);
     void visit(ForStmtNode node);
     void visit(WhileStmtNode node);
+    void visit(BreakNode node);
+    void visit(ContinueNode node);
+    void visit(ReturnNode node);
 
     void visit(PrefixExprNode node);
     void visit(PostfixExprNode node);
     void visit(ClassMemberExprNode node);
-//    void visit(CallFuncExprNode node);
+    void visit(CallFuncExprNode node);
     void visit(SubscriptExprNode node);
     void visit(BinaryExprNode node);
     void visit(AssignExprNode node);

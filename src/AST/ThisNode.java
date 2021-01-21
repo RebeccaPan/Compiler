@@ -1,12 +1,16 @@
 package AST;
 
 import Util.LocationType;
-import Util.ScopeType;
+import Util.Symbol.*;
 
-public class ThisNode extends ASTNode {
-    public ThisNode(ScopeType _scope, LocationType _location) {
-        super(_scope, _location);
+public class ThisNode extends ExprNode {
+    private Symbol Symbol;
+    public ThisNode(LocationType _location) {
+        super(_location);
     }
+    public Util.Symbol.Symbol getSymbol() { return Symbol; }
+    public void setSymbol(Util.Symbol.Symbol symbol) { Symbol = symbol; }
+
     @Override
     public void accept(ASTVisitor visitor) { visitor.visit(this); }
 }
