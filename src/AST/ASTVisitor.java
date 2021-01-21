@@ -3,7 +3,6 @@ package AST;
 import java.net.IDN;
 
 public interface ASTVisitor {
-    // TODO
     void visit(BoolLiteralNode node);
     void visit(IntLiteralNode node);
     void visit(StrLiteralNode node);
@@ -13,7 +12,9 @@ public interface ASTVisitor {
     void visit(DefNode node);
     void visit(ClassDefNode node);
     void visit(FuncDefNode node);
+    void visit(ConstructorDefNode node);
     void visit(VarDefNode node);
+    void visit(VarDefStmtNode node);
 
     void visit(TypeNode node);
     void visit(SimpleTypeNode node);
@@ -26,7 +27,7 @@ public interface ASTVisitor {
     void visit(NewExprNode node);
 
     void visit(SuiteNode node);
-//    void visit(StmtNode node);
+    void visit(ExprStmtNode node);
     void visit(IfStmtNode node);
     void visit(ForStmtNode node);
     void visit(WhileStmtNode node);

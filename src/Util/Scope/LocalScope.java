@@ -33,6 +33,7 @@ public class LocalScope implements ScopeType {
     @Override public void addVar(VarSymbol cur) {
         assertNotExistID(cur.getID());
         varMap.put(cur.getID(), cur);
+        varList.add(cur);
     }
 
     @Override public void addFunc(FuncSymbol cur) {
@@ -45,7 +46,7 @@ public class LocalScope implements ScopeType {
     }
 
     @Override public boolean existID(String ID) {
-        ScopeType globalScope = this;
+        ScopeType globalScope = outerScope();
         while (globalScope instanceof LocalScope) globalScope = globalScope.outerScope();
         return varMap.containsKey(ID) || funcMap.containsKey(ID) || ((GlobalScope) globalScope).getClassMap().containsKey(ID);
     }
@@ -59,6 +60,6 @@ public class LocalScope implements ScopeType {
     public Symbol findSymbol(String ID) {
         if (varMap.containsKey(ID)) return varMap.get(ID);
         if (funcMap.containsKey(ID)) return funcMap.get(ID);
-        throw new CompilationError("Symbol: " + ID + " not found (in Local Scope)");
+        return outerScope().findSymbol(ID);
     }
 }

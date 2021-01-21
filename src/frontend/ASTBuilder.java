@@ -36,6 +36,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 		// return SuiteNode
 		ArrayList<StmtNode> stmtList = new ArrayList<>();
 		for (var curStmt : ctx.stmt()) {
+			if (curStmt == null) continue;
 			stmtList.add((StmtNode) visit(curStmt));
 		}
         return new SuiteNode(new LocationType(ctx), stmtList);
@@ -46,7 +47,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitVarDefStmt(MxParser.VarDefStmtContext ctx) {
-    	return visit(ctx.varDef());
+    	return new VarDefStmtNode(new LocationType(ctx), (VarDefNode) visit(ctx.varDef()));
     }
 
 	@Override public ASTNode visitIfStmt(MxParser.IfStmtContext ctx) {
@@ -95,7 +96,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitExprStmt(MxParser.ExprStmtContext ctx) {
-    	return visit(ctx.expr());
+    	return new ExprStmtNode(new LocationType(ctx), (ExprNode) visit(ctx.expr()));
     }
 
 	@Override public ASTNode visitEmptyStmt(MxParser.EmptyStmtContext ctx) {
@@ -127,9 +128,10 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 
 	@Override public ASTNode visitFuncDef(MxParser.FuncDefContext ctx) {
 		// return FuncDefNode
+		TypeNode typeVoid = new TypeNode(new LocationType(ctx), new SimpleTypeNode(new LocationType(ctx), "void", false), 0);
     	return new FuncDefNode(
 				new LocationType(ctx),
-				(TypeNode) visit(ctx.type()),
+				(ctx.type() == null) ? typeVoid : (TypeNode) visit(ctx.type()),
 				ctx.ID().getText(),
 				(ctx.paraList() != null) ? (ParaListNode) visit(ctx.paraList()) : null,
 				(SuiteNode) visit(ctx.suite()) );

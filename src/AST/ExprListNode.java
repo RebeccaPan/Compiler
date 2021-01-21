@@ -8,6 +8,7 @@ public class ExprListNode extends ASTNode {
     private ArrayList<ExprNode> exprList;
     public ExprListNode(LocationType _location) {
         super(_location);
+        exprList = new ArrayList<>();
     }
     public void add(ExprNode expr) { exprList.add(expr); }
     public ArrayList<ExprNode> getExprList() { return exprList; }

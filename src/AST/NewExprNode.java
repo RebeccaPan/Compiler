@@ -11,6 +11,7 @@ public class NewExprNode extends ExprNode {
     public NewExprNode (LocationType _location, SimpleTypeNode _simpleType, ArrayList<ExprNode> _dimExprList, int _dim) {
         super(_location);
         simpleType = _simpleType; dimExprList = _dimExprList; dim = _dim;
+        if (dimExprList == null) dimExprList = new ArrayList<>();
     }
     public void add(ExprNode expr) { dimExprList.add(expr); }
     public SimpleTypeNode getSimpleType() { return simpleType; }

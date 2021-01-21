@@ -210,19 +210,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExprList(MxParser.ExprListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code simpleCreator}
+	 * Visit a parse tree produced by the {@code wrongCreator}
 	 * labeled alternative in {@link MxParser#creator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSimpleCreator(MxParser.SimpleCreatorContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code classCreator}
-	 * labeled alternative in {@link MxParser#creator}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitClassCreator(MxParser.ClassCreatorContext ctx);
+	T visitWrongCreator(MxParser.WrongCreatorContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code arrayCreator}
 	 * labeled alternative in {@link MxParser#creator}.
@@ -231,12 +224,19 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArrayCreator(MxParser.ArrayCreatorContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code wrongCreator}
+	 * Visit a parse tree produced by the {@code classCreator}
 	 * labeled alternative in {@link MxParser#creator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitWrongCreator(MxParser.WrongCreatorContext ctx);
+	T visitClassCreator(MxParser.ClassCreatorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code simpleCreator}
+	 * labeled alternative in {@link MxParser#creator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSimpleCreator(MxParser.SimpleCreatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#para}.
 	 * @param ctx the parse tree

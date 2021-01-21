@@ -20,13 +20,13 @@ public class ArrayType implements Type {
 
     @Override
     public void assignable(Type otherType, LocationType location) {
-        // TODO
-        throw new CompilationError("Array Type not equable with " + otherType.getType(), location);
+        if (getType().equals(otherType.getType()) || otherType.getType().equals("null")) return;
+        throw new CompilationError("Array Type not assignable with " + otherType.getType(), location);
     }
 
     @Override
     public void comparable(Type otherType, LocationType location) {
-        // TODO
+        if (otherType.getType().equals("null")) return;
         throw new CompilationError("Array Type not comparable with " + otherType.getType(), location);
     }
 }
