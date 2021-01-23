@@ -6,6 +6,7 @@ import Util.Symbol.*;
 public class IDNode extends ExprNode {
     private String ID;
     private Symbol symbol;
+
     public IDNode(LocationType _location, String _ID) {
         super(_location); ID = _ID;
     }

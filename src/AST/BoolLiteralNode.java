@@ -4,7 +4,7 @@ import Util.*;
 
 public class BoolLiteralNode extends ExprNode {
     private boolean val;
-    // constructor
+
     public BoolLiteralNode(LocationType _location, boolean _val) {
         super(_location);
         this.val = _val;

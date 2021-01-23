@@ -98,7 +98,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitReturnStmt(MxParser.ReturnStmtContext ctx) {
-		// // return ReturnNode
+		// return ReturnNode
     	if (ctx.expr() != null)
     		return new ReturnNode(new LocationType(ctx), (ExprNode) visit(ctx.expr()), true);
     	else
@@ -106,10 +106,12 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
     }
 
 	@Override public ASTNode visitExprStmt(MxParser.ExprStmtContext ctx) {
+		// return ExprStmtNode
     	return new ExprStmtNode(new LocationType(ctx), (ExprNode) visit(ctx.expr()));
     }
 
 	@Override public ASTNode visitEmptyStmt(MxParser.EmptyStmtContext ctx) {
+		// return EmptyNode
     	return new EmptyNode(new LocationType(ctx));
     }
 

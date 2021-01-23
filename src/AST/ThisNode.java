@@ -5,6 +5,7 @@ import Util.Symbol.*;
 
 public class ThisNode extends ExprNode {
     private Symbol Symbol;
+
     public ThisNode(LocationType _location) {
         super(_location);
     }

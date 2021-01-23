@@ -9,6 +9,7 @@ public class SimpleVarDefNode extends ASTNode {
     private ExprNode expr;
     private TypeNode type;
     private VarSymbol varSymbol;
+
     public SimpleVarDefNode(LocationType _location, String _varID, TypeNode _type, ExprNode _expr) {
         super(_location);
         varID = _varID; type = _type; expr = _expr;

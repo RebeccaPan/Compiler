@@ -8,7 +8,6 @@ public class FuncDefNode extends DefNode {
     private String funcID;
     private ParaListNode paraList;
     private SuiteNode suite;
-
     private FuncSymbol funcSymbol;
 
     public FuncDefNode(
@@ -20,7 +19,6 @@ public class FuncDefNode extends DefNode {
         super(_location);
         type = _type; funcID = _funcID; paraList = _paraList; suite = _suite;
     }
-
     public TypeNode getType() { return type; }
     public void setType(TypeNode type) { this.type = type; }
     public String getFuncID() { return funcID; }

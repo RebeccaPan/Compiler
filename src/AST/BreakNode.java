@@ -4,6 +4,7 @@ import Util.LocationType;
 
 public class BreakNode extends StmtNode {
     private ASTNode next;
+
     public BreakNode(LocationType _location) {
         super(_location);
     }

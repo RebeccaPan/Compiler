@@ -5,6 +5,7 @@ import Util.LocationType;
 public class TypeNode extends ASTNode {
     private SimpleTypeNode simpleTypeNode;
     private int dim;
+
     public TypeNode (LocationType _location, SimpleTypeNode _simpleTypeNode, int _dim) {
         super(_location);
         simpleTypeNode = _simpleTypeNode;

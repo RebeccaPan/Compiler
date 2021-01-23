@@ -4,6 +4,7 @@ import Util.LocationType;
 
 public class SubscriptExprNode extends ExprNode {
     private ExprNode arr, index;
+
     public SubscriptExprNode(LocationType _location, ExprNode _arr, ExprNode _index) {
         super(_location);
         arr = _arr; index = _index;

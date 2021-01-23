@@ -12,7 +12,7 @@ public class BoolType implements Type {
     @Override
     public void assignable(Type otherType, LocationType location) {
         if (otherType.getType().equals("bool")) return;
-        throw new CompilationError("Bool Type not equable with " + otherType.getType(), location);
+        throw new CompilationError("Bool Type not assignable with " + otherType.getType(), location);
     }
 
     @Override

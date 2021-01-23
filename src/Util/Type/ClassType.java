@@ -14,7 +14,7 @@ public class ClassType implements Type {
     @Override
     public void assignable(Type otherType, LocationType location) {
         if (otherType.getType().equals(classID) || otherType.getType().equals("null")) return;
-        throw new CompilationError("Class Type not equable with " + otherType.getType(), location);
+        throw new CompilationError("Class Type not assignable with " + otherType.getType(), location);
     }
 
     @Override

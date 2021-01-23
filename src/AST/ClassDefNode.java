@@ -10,7 +10,6 @@ public class ClassDefNode extends DefNode {
     private ArrayList<VarDefNode> varDefList;
     private ArrayList<FuncDefNode> funcDefList;
     private ArrayList<ConstructorDefNode> constructorDefList;
-
     private ClassSymbol classSymbol;
 
     public ClassDefNode(LocationType _location, String _classID) {

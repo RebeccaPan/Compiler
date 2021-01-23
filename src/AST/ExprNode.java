@@ -9,6 +9,9 @@ abstract public class ExprNode extends ASTNode{
     public enum ExprCat {LVal, RVal, Class, Func};
     private ExprCat exprCat;
 
+    public ExprNode(LocationType _location) {
+        super(_location);
+    }
     public Type getType() { return type; }
     public void setType(Type type) { this.type = type; }
     public ExprCat getExprCat() { return exprCat; }
@@ -16,9 +19,5 @@ abstract public class ExprNode extends ASTNode{
     public void assertIsVal(LocationType curLoc) {
         if (!(exprCat == ExprCat.LVal || exprCat == ExprCat.RVal))
             throw new CompilationError("Expr not as LVal or RVal", curLoc);
-    }
-
-    public ExprNode(LocationType _location) {
-        super(_location);
     }
 }

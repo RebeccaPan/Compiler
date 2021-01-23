@@ -7,7 +7,6 @@ abstract public class ASTNode {
     private ScopeType scope;
     private LocationType location;
 
-    // constructor
     public ASTNode(LocationType _location) {
         this.location = _location;
     }

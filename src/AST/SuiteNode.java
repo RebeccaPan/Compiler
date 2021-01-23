@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class SuiteNode extends StmtNode {
     private ArrayList<StmtNode> stmtNodeList;
+
     public SuiteNode (LocationType _location, ArrayList<StmtNode> _stmtNodeList) {
         super(_location);
         stmtNodeList = _stmtNodeList;

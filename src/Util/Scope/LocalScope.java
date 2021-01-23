@@ -28,32 +28,38 @@ public class LocalScope implements ScopeType {
     public Map<String, FuncSymbol> getFuncMap() { return funcMap; }
     public ArrayList<VarSymbol> getVarList() { return varList; }
 
-    @Override public ScopeType outerScope() { return outerScope; }
+    @Override
+    public ScopeType outerScope() { return outerScope; }
 
-    @Override public void addVar(VarSymbol cur) {
+    @Override
+    public void addVar(VarSymbol cur) {
         assertNotExistID(cur.getID());
         varMap.put(cur.getID(), cur);
         varList.add(cur);
     }
 
-    @Override public void addFunc(FuncSymbol cur) {
+    @Override
+    public void addFunc(FuncSymbol cur) {
         assertNotExistID(cur.getID());
         funcMap.put(cur.getID(), cur);
     }
 
     public void addConstructor (FuncSymbol cur) { funcMap.put(cur.getID(), cur); }
 
-    @Override public void addClass(ClassSymbol cur) {
+    @Override
+    public void addClass(ClassSymbol cur) {
         throw new CompilationError("ClassSymbol: " + cur.getID() + " addClass in Local Scope");
     }
 
-    @Override public boolean existID(String ID) {
+    @Override
+    public boolean existID(String ID) {
         ScopeType globalScope = outerScope();
         while (globalScope instanceof LocalScope) globalScope = globalScope.outerScope();
         return varMap.containsKey(ID) || funcMap.containsKey(ID) || ((GlobalScope) globalScope).getClassMap().containsKey(ID);
     }
 
-    @Override public void assertNotExistID(String ID) {
+    @Override
+    public void assertNotExistID(String ID) {
         if (existID(ID))
             throw new CompilationError("Symbol: " + ID + " conflicted in (Local Scope)");
     }

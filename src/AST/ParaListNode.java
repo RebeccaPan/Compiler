@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class ParaListNode extends ASTNode {
     private ArrayList<ParaNode> paraList;
+
     public ParaListNode (LocationType _location) {
         super(_location);
         paraList = new ArrayList<ParaNode>();

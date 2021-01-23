@@ -6,7 +6,6 @@ import Util.Symbol.*;
 public class ClassMemberExprNode extends ExprNode {
     private ExprNode expr;
     private String ID;
-
     private Symbol symbol;
 
     public ClassMemberExprNode(LocationType _location, ExprNode _expr, String _ID) {

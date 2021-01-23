@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class ProgramNode extends ASTNode {
     ArrayList<DefNode> defNodeList;
+
     public ProgramNode(LocationType _location, ArrayList<DefNode> _defNodeList) {
         super(_location);
         defNodeList = _defNodeList;

@@ -12,7 +12,7 @@ public class IntType implements Type {
     @Override
     public void assignable(Type otherType, LocationType location) {
         if (otherType.getType().equals("int")) return;
-        throw new CompilationError("Int Type not equable with " + otherType.getType(), location);
+        throw new CompilationError("Int Type not assignable with " + otherType.getType(), location);
     }
 
     @Override

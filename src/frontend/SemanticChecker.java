@@ -20,10 +20,10 @@ public class SemanticChecker implements ASTVisitor {
         LocationType virtualLoc = new LocationType(-1, -1);
 
         // int, bool, string, void
-        ClassSymbol Int    = new ClassSymbol("int", new LocalScope(curScope), new IntType(), virtualLoc);
-        ClassSymbol Bool   = new ClassSymbol("bool", new LocalScope(curScope), new BoolType(), virtualLoc);
+        ClassSymbol Int    = new ClassSymbol("int",    new LocalScope(curScope), new IntType(), virtualLoc);
+        ClassSymbol Bool   = new ClassSymbol("bool",   new LocalScope(curScope), new BoolType(), virtualLoc);
         ClassSymbol string = new ClassSymbol("string", new LocalScope(curScope), new StringType(), virtualLoc);
-        ClassSymbol Void   = new ClassSymbol("void", new LocalScope(curScope), new VoidType(), virtualLoc);
+        ClassSymbol Void   = new ClassSymbol("void",   new LocalScope(curScope), new VoidType(), virtualLoc);
 
         // - set scope of string after creating FuncSymbol length, substring, parseInt, ord
         LocalScope StringScope = new LocalScope(curScope);
@@ -218,9 +218,12 @@ public class SemanticChecker implements ASTVisitor {
         for (var curNode : node.getDefNodeList()) {
             if (curNode instanceof FuncDefNode) {
                 if (((FuncDefNode) curNode).getFuncID().equals("main")) {
-                    if (mainFuncFound) throw new CompilationError("Semantic - multiple main func", curNode.getLocation());
-                    if (((FuncDefNode) curNode).getParaList() != null) throw new CompilationError("Semantic - main func paraList no empty", curNode.getLocation());
-                    if (((FuncDefNode) curNode).getType().getSimpleTypeNode().getType() != "int") throw new CompilationError("Semantic - main func type should be int", curNode.getLocation());
+                    if (mainFuncFound)
+                        throw new CompilationError("Semantic - multiple main func", curNode.getLocation());
+                    if (((FuncDefNode) curNode).getParaList() != null)
+                        throw new CompilationError("Semantic - main func paraList no empty", curNode.getLocation());
+                    if (!((FuncDefNode) curNode).getType().getSimpleTypeNode().getType().equals("int"))
+                        throw new CompilationError("Semantic - main func type should be int", curNode.getLocation());
                     else mainFuncFound = true;
                 }
                 // add info of curFunc(Symbol) in curScope
@@ -261,7 +264,6 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(ClassDefNode node) {
-//        curScope.assertNotExistID(node.getClassID());
         ClassSymbol classSymbol = node.getClassSymbol();
         curClass = classSymbol;
         curScope = classSymbol.getScope();
@@ -363,8 +365,6 @@ public class SemanticChecker implements ASTVisitor {
         curScope.addVar(varSymbol);
         node.setScope(curScope);
         node.setVarSymbol(varSymbol);
-//        if (!curScope.existID(node.getParaID()))
-//            throw new CompilationError("Semantic - paraID not found in scope", node.getLocation());
     }
 
     @Override
@@ -436,7 +436,7 @@ public class SemanticChecker implements ASTVisitor {
                 throw new CompilationError("Semantic - for stmt cond with type as func");
             new BoolType().assignable(node.getCond().getType(), node.getCond().getLocation());
         }
-        else {
+        else { // set empty cond as true
             node.setCond(new BoolLiteralNode(node.getLocation(), true));
             node.getCond().accept(this);
         }
@@ -487,7 +487,7 @@ public class SemanticChecker implements ASTVisitor {
         if (!(node.isWithRet()) && !(node.getFuncSymbol().getType() instanceof VoidType)) {
             throw new CompilationError("Semantic - return without val found in non-void func", node.getLocation());
         }
-        else if(node.isWithRet()){
+        else if(node.isWithRet()) {
             if (node.getFuncSymbol().getType() instanceof VoidType)
                 throw new CompilationError("Semantic - return with val found in void func", node.getLocation());
             node.getRetExpr().accept(this);

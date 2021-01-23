@@ -7,6 +7,7 @@ public class ReturnNode extends StmtNode {
     private ExprNode retExpr;
     private boolean withRet;
     private FuncSymbol funcSymbol;
+
     public ReturnNode(LocationType _location, ExprNode _retExpr, boolean _withRet) {
         super(_location);
         retExpr = _retExpr; withRet = _withRet;

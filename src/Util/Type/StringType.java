@@ -11,7 +11,7 @@ public class StringType implements Type {
     @Override
     public void assignable(Type otherType, LocationType location) {
         if (otherType.getType().equals("string") || otherType.getType().equals("null")) return;
-        throw new CompilationError("String Type not equable with " + otherType.getType(), location);
+        throw new CompilationError("String Type not assignable with " + otherType.getType(), location);
     }
 
     @Override

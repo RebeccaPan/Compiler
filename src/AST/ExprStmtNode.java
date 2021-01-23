@@ -4,6 +4,7 @@ import Util.LocationType;
 
 public class ExprStmtNode extends StmtNode {
     private ExprNode exprNode;
+
     public ExprStmtNode(LocationType _location, ExprNode _exprNode) {
         super(_location); exprNode = _exprNode;
     }

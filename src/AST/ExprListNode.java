@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class ExprListNode extends ASTNode {
     private ArrayList<ExprNode> exprList;
+
     public ExprListNode(LocationType _location) {
         super(_location);
         exprList = new ArrayList<>();

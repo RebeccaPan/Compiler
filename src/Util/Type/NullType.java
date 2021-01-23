@@ -11,7 +11,7 @@ public class NullType implements Type {
 
     @Override
     public void assignable(Type otherType, LocationType location) {
-        throw new CompilationError("Null Type not equable with " + otherType.getType(), location);
+        throw new CompilationError("Null Type not assignable with " + otherType.getType(), location);
     }
 
     @Override
