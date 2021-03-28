@@ -224,7 +224,7 @@ public class IRBuilder implements ASTVisitor {
             line.setLabel(iterStart);
             curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.BNEQ);
+            line = new IRLine(IRLine.OPCODE.BEQ);
             line.addReg(iter);
             line.addReg(CONST_NULL);
             line.setLabel(iterEnd);
@@ -312,7 +312,7 @@ public class IRBuilder implements ASTVisitor {
         if (node.getFalseSuite().getStmtNodeList().size() > 0) condFalse = ++labelNum;
 
         node.getCond().accept(this);
-        IRLine line = new IRLine(IRLine.OPCODE.BNEQ);
+        IRLine line = new IRLine(IRLine.OPCODE.BEQ);
         line.addReg(node.getCond().getReg());
         line.addReg(CONST_NULL);
         line.setLabel( (node.getFalseSuite().getStmtNodeList().size() > 0) ? condFalse : condEnd);
@@ -358,7 +358,7 @@ public class IRBuilder implements ASTVisitor {
 
         if (node.getCond() != null) {
             node.getCond().accept(this);
-            line = new IRLine(IRLine.OPCODE.BNEQ);
+            line = new IRLine(IRLine.OPCODE.BEQ);
             line.addReg(node.getCond().getReg());
             line.addReg(CONST_NULL);
             line.setLabel(loopEnd);
@@ -397,7 +397,7 @@ public class IRBuilder implements ASTVisitor {
         curBlock.addLine(line);
         if (node.getExpr() != null) {
             node.getExpr().accept(this);
-            line = new IRLine(IRLine.OPCODE.BNEQ);
+            line = new IRLine(IRLine.OPCODE.BEQ);
             line.addReg(node.getExpr().getReg());
             line.addReg(CONST_NULL);
             line.setLabel(loopEnd);
@@ -571,14 +571,14 @@ public class IRBuilder implements ASTVisitor {
         if (op.equals("&&") || op.equals("||")) {
             int Mid = ++labelNum, End = ++labelNum;
             node.getLhs().accept(this);
-            IRLine line = new IRLine( op.equals("&&") ? IRLine.OPCODE.BNEQ : IRLine.OPCODE.BEQ);
+            IRLine line = new IRLine( op.equals("&&") ? IRLine.OPCODE.BEQ : IRLine.OPCODE.BNEQ);
             line.addReg(node.getLhs().getReg());
             line.addReg(CONST_NULL);
             line.setLabel(Mid);
             curBlock.addLine(line);
 
             node.getRhs().accept(this);
-            line = new IRLine( op.equals("&&") ? IRLine.OPCODE.BNEQ : IRLine.OPCODE.BEQ );
+            line = new IRLine( op.equals("&&") ? IRLine.OPCODE.BEQ : IRLine.OPCODE.BNEQ );
             line.addReg(node.getRhs().getReg());
             line.addReg(CONST_NULL);
             line.setLabel(Mid);
