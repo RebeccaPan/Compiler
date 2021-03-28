@@ -67,23 +67,23 @@ simpleVarDef: ID | ID '=' expr;
 constructorDef: ID '(' paraList? ')' suite;
 
 expr
-    : primary                                                  #atomExpr
-    | expr op=('++' | '--')                                    #postfixExpr
-    | <assoc=right> NEW creator                                #newExpr
-    | expr '.' ID                                              #classMemberExpr
-    | expr '(' exprList? ')'                                   #callFuncExpr
-    | expr '[' expr ']'                                        #subscriptExpr
-    | <assoc=right> op=('++' | '--') expr                      #prefixExpr
-    | <assoc=right> op=( '+' | '-' ) expr                      #prefixExpr
-    | <assoc=right> op=( '!' | '~' ) expr                      #prefixExpr
-    | expr op=('*' | '/' | '%') expr                           #binaryExpr
-    | expr op=('+' | '-') expr                                 #binaryExpr
-    | expr op=('<<' | '>>') expr                               #binaryExpr
-    | expr op=('<' | '>' | '<=' | '>=') expr                   #binaryExpr
-    | expr op=('==' | '!=') expr                               #binaryExpr
-    | expr op=('&' | '|' | '^') expr                           #binaryExpr
-    | expr op=('&&' | '||') expr                               #binaryExpr
-    | <assoc=right> expr '=' expr                              #assignExpr
+    : primary                                       #atomExpr
+    | expr op=('++' | '--')                         #postfixExpr
+    | <assoc=right> NEW creator                     #newExpr
+    | expr '.' ID                                   #classMemberExpr
+    | expr '(' exprList? ')'                        #callFuncExpr
+    | expr '[' expr ']'                             #subscriptExpr
+    | <assoc=right> op=('++' | '--') expr           #prefixExpr
+    | <assoc=right> op=( '+' | '-' ) expr           #prefixExpr
+    | <assoc=right> op=( '!' | '~' ) expr           #prefixExpr
+    | expr op=('*' | '/' | '%') expr                #binaryExpr
+    | expr op=('+' | '-') expr                      #binaryExpr
+    | expr op=('<<' | '>>') expr                    #binaryExpr
+    | expr op=('<' | '>' | '<=' | '>=') expr        #binaryExpr
+    | expr op=('==' | '!=') expr                    #binaryExpr
+    | expr op=('&' | '|' | '^') expr                #binaryExpr
+    | expr op=('&&' | '||') expr                    #binaryExpr
+    | <assoc=right> expr '=' expr                   #assignExpr
     ;
 
 primary

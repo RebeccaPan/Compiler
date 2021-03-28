@@ -1,21 +1,44 @@
 import AST.*;
+import IR.IRBlockList;
+import IR.IRBuilder;
+import Util.Scope.GlobalScope;
+import Util.Scope.ScopeType;
 import frontend.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parser.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        // change relative address here:
-        // String filename = "./testcase/sema/misc-package/misc-27.mx";
+//        change relative address here:
+//        String filename = "./testcase/codegen/e1.mx";
         try {
-            // InputStream file = new FileInputStream(filename);
-            InputStream file = System.in;
-            ProgramNode ast = BuildAST(file);
-            new SemanticChecker().visit(ast);
+            boolean semantic = false, codegen = false;
+//            InputStream file = new FileInputStream(filename);
+            InputStream inFile = System.in;
+            File outFile = new File("output.s");
+            PrintStream stream = new PrintStream(outFile);
+            System.setOut(stream);
+            for (String arg : args) {
+                if (arg.equals("-semantic")) semantic = true;
+                if (arg.equals("-codegen")) codegen = true;
+            }
+            ProgramNode ast = BuildAST(inFile);
+            IRBlockList blockList = new IRBlockList();
+            GlobalScope globalScope = new GlobalScope();
+            new SemanticChecker(blockList).visit(ast);
+
+            if (codegen) {
+                new IRBuilder(globalScope, blockList).visit(ast);
+                // blockList.print();
+                blockList.initASM();
+                blockList.printASM();
+            }
         } catch (Exception err) {
             err.printStackTrace();
             System.err.println(err.getMessage());

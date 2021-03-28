@@ -5,16 +5,16 @@ import Util.Symbol.*;
 
 public class ClassMemberExprNode extends ExprNode {
     private ExprNode expr;
-    private String ID;
+    private IDNode ID;
     private Symbol symbol;
 
-    public ClassMemberExprNode(LocationType _location, ExprNode _expr, String _ID) {
+    public ClassMemberExprNode(LocationType _location, ExprNode _expr, IDNode _ID) {
         super(_location);
         expr = _expr;
         ID = _ID;
     }
     public ExprNode getExpr() { return expr; }
-    public String getID() { return ID; }
+    public IDNode getID() { return ID; }
     public Symbol getSymbol() { return symbol; }
     public void setSymbol(Symbol symbol) { this.symbol = symbol; }
 

@@ -194,7 +194,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>{
 		return new ClassMemberExprNode(
 				new LocationType(ctx),
 				(ExprNode) visit(ctx.expr()),
-				ctx.ID().getText() );
+				new IDNode(new LocationType(ctx), ctx.ID().getText()) );
     }
 
 	@Override public ASTNode visitSubscriptExpr(MxParser.SubscriptExprContext ctx) {

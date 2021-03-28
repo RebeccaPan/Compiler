@@ -1,5 +1,6 @@
 package Util.Symbol;
 
+import IR.IRReg;
 import Util.LocationType;
 import Util.Scope.ScopeType;
 import Util.Type.*;

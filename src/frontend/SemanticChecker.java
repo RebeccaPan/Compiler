@@ -1,6 +1,8 @@
 package frontend;
 
 import AST.*;
+import IR.IRBlockList;
+import IR.IRReg;
 import Util.CompilationError;
 import Util.LocationType;
 import Util.Scope.*;
@@ -12,10 +14,12 @@ public class SemanticChecker implements ASTVisitor {
     private ClassSymbol curClass;
     private FuncSymbol curFunc;
     private ASTNode curLoop;
+    private IRBlockList curBlockList;
 
-    public SemanticChecker() {
+    public SemanticChecker(IRBlockList _curBlockList) {
         curScope = new GlobalScope();
         curClass = null; curFunc = null; curLoop = null;
+        curBlockList = _curBlockList;
 
         LocationType virtualLoc = new LocationType(-1, -1);
 
@@ -27,21 +31,21 @@ public class SemanticChecker implements ASTVisitor {
 
         // - set scope of string after creating FuncSymbol length, substring, parseInt, ord
         LocalScope StringScope = new LocalScope(curScope);
-        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc);
+        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc, false);
         StringScope.addFunc(Length);
-        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc);
+        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc, false);
         LocalScope SubstringScope = new LocalScope(string.getScope());
-        VarSymbol Left  = new VarSymbol("left", SubstringScope, new IntType(), Substring.getLoc());
-        VarSymbol Right = new VarSymbol("right", SubstringScope, new IntType(), Substring.getLoc());
+        VarSymbol Left  = new VarSymbol("left", SubstringScope, new IntType(), Substring.getLoc(), 1);
+        VarSymbol Right = new VarSymbol("right", SubstringScope, new IntType(), Substring.getLoc(), 1);
         SubstringScope.addVar(Left);
         SubstringScope.addVar(Right);
         Substring.setScope(SubstringScope);
         StringScope.addFunc(Substring);
-        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc);
+        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc, false);
         StringScope.addFunc(ParseInt);
-        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc);
+        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc, false);
         LocalScope OrdScope = new LocalScope(curScope);
-        VarSymbol Pos = new VarSymbol("pos", OrdScope, new IntType(), virtualLoc);
+        VarSymbol Pos = new VarSymbol("pos", OrdScope, new IntType(), virtualLoc, 1);
         OrdScope.addVar(Pos);
         Ord.setScope(OrdScope);
         StringScope.addFunc(Ord);
@@ -53,50 +57,50 @@ public class SemanticChecker implements ASTVisitor {
         curScope.addClass(Void);
 
         // toString, size
-        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc);
+        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, false);
         LocalScope ToStringScope = new LocalScope(curScope);
-        VarSymbol ItoStr = new VarSymbol("i", ToStringScope, new IntType(), virtualLoc);
+        VarSymbol ItoStr = new VarSymbol("i", ToStringScope, new IntType(), virtualLoc, 1);
         ToStringScope.addVar(ItoStr);
         ToString.setScope(ToStringScope);
         curScope.addFunc(ToString);
 
-        FuncSymbol ArraySize = new FuncSymbol("#size#", new LocalScope(curScope), new IntType(), virtualLoc);
+        FuncSymbol ArraySize = new FuncSymbol("#size#", new LocalScope(curScope), new IntType(), virtualLoc, false);
         curScope.addFunc(ArraySize);
 
         // Print & PrintLn with VarSymbol StrPrint(Ln) in local scope
-        FuncSymbol Print = new FuncSymbol("print", new LocalScope(curScope), new VoidType(), virtualLoc);
+        FuncSymbol Print = new FuncSymbol("print", new LocalScope(curScope), new VoidType(), virtualLoc, false);
         LocalScope PrintScope = new LocalScope(curScope);
-        VarSymbol StrPrint = new VarSymbol("str", PrintScope, new StringType(), virtualLoc);
+        VarSymbol StrPrint = new VarSymbol("str", PrintScope, new StringType(), virtualLoc, 1);
         PrintScope.addVar(StrPrint);
         Print.setScope(PrintScope);
         curScope.addFunc(Print);
 
-        FuncSymbol PrintLn = new FuncSymbol("println", new LocalScope(curScope), new VoidType(), virtualLoc);
+        FuncSymbol PrintLn = new FuncSymbol("println", new LocalScope(curScope), new VoidType(), virtualLoc, false);
         LocalScope PrintLnScope = new LocalScope(curScope);
-        VarSymbol StrPrintLn = new VarSymbol("str", PrintLnScope, new StringType(), virtualLoc);
+        VarSymbol StrPrintLn = new VarSymbol("str", PrintLnScope, new StringType(), virtualLoc, 1);
         PrintLnScope.addVar(StrPrintLn);
         PrintLn.setScope(PrintLnScope);
         curScope.addFunc(PrintLn);
 
-        FuncSymbol GetStr = new FuncSymbol("getString", new LocalScope(curScope), new StringType(), virtualLoc);
+        FuncSymbol GetStr = new FuncSymbol("getString", new LocalScope(curScope), new StringType(), virtualLoc, false);
         curScope.addFunc(GetStr);
 
         // PrintInt & PrintLnInt with VarSymbol IntPrintLn in local scope
-        FuncSymbol PrintInt = new FuncSymbol("printInt", new LocalScope(curScope), new VoidType(), virtualLoc);
+        FuncSymbol PrintInt = new FuncSymbol("printInt", new LocalScope(curScope), new VoidType(), virtualLoc, false);
         LocalScope PrintIntScope = new LocalScope(curScope);
-        VarSymbol IntPrint = new VarSymbol("num", PrintIntScope, new IntType(), virtualLoc);
+        VarSymbol IntPrint = new VarSymbol("num", PrintIntScope, new IntType(), virtualLoc, 1);
         PrintIntScope.addVar(IntPrint);
         PrintInt.setScope(PrintIntScope);
         curScope.addFunc(PrintInt);
 
-        FuncSymbol PrintIntLn = new FuncSymbol("printlnInt", new LocalScope(curScope), new VoidType(), virtualLoc);
+        FuncSymbol PrintIntLn = new FuncSymbol("printlnInt", new LocalScope(curScope), new VoidType(), virtualLoc, false);
         LocalScope PrintIntLnScope = new LocalScope(curScope);
-        VarSymbol IntPrintLn = new VarSymbol("num", PrintIntLnScope, new IntType(), virtualLoc);
+        VarSymbol IntPrintLn = new VarSymbol("num", PrintIntLnScope, new IntType(), virtualLoc, 1);
         PrintIntLnScope.addVar(IntPrintLn);
         PrintIntLn.setScope(PrintIntLnScope);
         curScope.addFunc(PrintIntLn);
 
-        FuncSymbol GetInt = new FuncSymbol("getInt", new LocalScope(curScope), new IntType(), virtualLoc);
+        FuncSymbol GetInt = new FuncSymbol("getInt", new LocalScope(curScope), new IntType(), virtualLoc, false);
         curScope.addFunc(GetInt);
     }
 
@@ -159,7 +163,7 @@ public class SemanticChecker implements ASTVisitor {
                             curNode.getFuncID(),
                             new LocalScope(curScope),
                             null,
-                            curNode.getLocation() );
+                            curNode.getLocation(), true );
                     curScope.addFunc(funcSymbol);
                     Type type = curScope.findSymbol(curNode.getType().getSimpleTypeNode().getType()).getType();
                     funcSymbol.setType( (curNode.getType().getDim() == 0) ? type : new ArrayType(type, curNode.getType().getDim()) );
@@ -183,7 +187,7 @@ public class SemanticChecker implements ASTVisitor {
                             curNode.getFuncID(),
                             new LocalScope(curScope),
                             new VoidType(),
-                            curNode.getLocation() );
+                            curNode.getLocation(), true );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curNode.setFuncSymbol(constructorSymbol);
@@ -201,7 +205,7 @@ public class SemanticChecker implements ASTVisitor {
                             classDefNode.getClassID(),
                             new LocalScope(curScope),
                             null,
-                            classDefNode.getLocation() );
+                            classDefNode.getLocation(), true );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curScope = constructorSymbol.getScope();
@@ -231,7 +235,7 @@ public class SemanticChecker implements ASTVisitor {
                         ((FuncDefNode) curNode).getFuncID(),
                         new LocalScope(curScope),
                         null,
-                        curNode.getLocation() );
+                        curNode.getLocation(), false );
                 curScope.addFunc(funcSymbol);
                 Type type = curScope.findSymbol(((FuncDefNode) curNode).getType().getSimpleTypeNode().getType()).getType();
                 funcSymbol.setType( (((FuncDefNode) curNode).getType().getDim() == 0) ? type : new ArrayType(type, ((FuncDefNode) curNode).getType().getDim()) );
@@ -318,6 +322,7 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(SimpleVarDefNode node) {
+        if (curScope instanceof GlobalScope) curBlockList.addGlobal(0);
         String typeStr = node.getType().getSimpleTypeNode().getType();
         int dim = node.getType().getDim();
         Type type, baseType = curScope.findClassSymbol(typeStr).getType();
@@ -329,7 +334,10 @@ public class SemanticChecker implements ASTVisitor {
             node.getExpr().accept(this);
             type.assignable(node.getExpr().getType(), node.getLocation());
         }
-        VarSymbol varSymbol = new VarSymbol(node.getVarID(), curScope, type, node.getLocation());
+        int allocateType;
+        if (curScope.outerScope() == null) allocateType = 2; // Global
+        else allocateType = (curClass == null) ? 1 : 11; // Local or inClass
+        VarSymbol varSymbol = new VarSymbol(node.getVarID(), curScope, type, node.getLocation(), allocateType);
         curScope.addVar(varSymbol);
         node.setScope(curScope);
         node.setVarSymbol(varSymbol);
@@ -361,7 +369,7 @@ public class SemanticChecker implements ASTVisitor {
             type = baseType;
         else
             type = new ArrayType(baseType, dim);
-        VarSymbol varSymbol = new VarSymbol(node.getParaID(), curScope, type, node.getLocation());
+        VarSymbol varSymbol = new VarSymbol(node.getParaID(), curScope, type, node.getLocation(), 1);
         curScope.addVar(varSymbol);
         node.setScope(curScope);
         node.setVarSymbol(varSymbol);
@@ -540,7 +548,7 @@ public class SemanticChecker implements ASTVisitor {
         node.getExpr().assertIsVal(node.getLocation());
         if (node.getExpr().getType() instanceof ClassType || node.getExpr().getType() instanceof StringType) {
             ClassSymbol classSymbol = curScope.findClassSymbol(node.getExpr().getType().getType());
-            Symbol symbol = classSymbol.getScope().findSymbol(node.getID());
+            Symbol symbol = classSymbol.getScope().findSymbol(node.getID().getID());
             node.setType(symbol.getType());
             node.setSymbol(symbol);
             if (symbol instanceof FuncSymbol) node.setExprCat(ExprNode.ExprCat.Func);
@@ -548,7 +556,7 @@ public class SemanticChecker implements ASTVisitor {
             else throw new CompilationError("Semantic - class member expr error", node.getLocation());
         }
         else if (node.getExpr().getType() instanceof ArrayType) {
-            if (node.getID().equals("size")) {
+            if (node.getID().getID().equals("size")) {
                 node.setType(new IntType());
                 node.setExprCat(ExprNode.ExprCat.Func);
                 node.setSymbol(curScope.findSymbol("#size#"));
@@ -682,6 +690,7 @@ public class SemanticChecker implements ASTVisitor {
         else if (symbol instanceof VarSymbol) {
             node.setType(symbol.getType());
             node.setExprCat(ExprNode.ExprCat.LVal);
+            node.setReg(node.getSymbol().getReg());
         }
         else throw new CompilationError("Semantic - IDNode not as class, func or var", node.getLocation());
     }

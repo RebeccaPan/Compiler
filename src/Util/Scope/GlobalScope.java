@@ -1,6 +1,7 @@
 package Util.Scope;
 
 import Util.CompilationError;
+import Util.RegIDAllocator;
 import Util.Symbol.*;
 
 import java.util.LinkedHashMap;
@@ -10,11 +11,13 @@ public class GlobalScope implements ScopeType {
     private Map<String, VarSymbol> varMap;
     private Map<String, FuncSymbol> funcMap;
     private Map<String, ClassSymbol> classMap;
+    public RegIDAllocator regIDAllocator;
 
     public GlobalScope() {
         varMap = new LinkedHashMap<>();
         funcMap = new LinkedHashMap<>();
         classMap = new LinkedHashMap<>();
+        regIDAllocator = new RegIDAllocator();
     }
 
     @Override public ScopeType outerScope() { return null; }
@@ -58,4 +61,23 @@ public class GlobalScope implements ScopeType {
         if (classMap.containsKey(ID)) return classMap.get(ID);
         throw new CompilationError("Symbol: " + ID + " not found (in Global Scope)");
     }
+
+    @Override
+    public VarSymbol findVarSymbol(String ID) {
+        if (varMap.containsKey(ID)) return varMap.get(ID);
+        throw new CompilationError("Symbol: " + ID + " not found (in Global Scope)");
+    }
+
+    @Override
+    public boolean existVarLocal(String ID) {
+        return varMap.containsKey(ID);
+    }
+
+    @Override
+    public boolean existFuncLocal(String ID) {
+        return funcMap.containsKey(ID);
+    }
+
+    @Override
+    public RegIDAllocator getRegIDAllocator() { return regIDAllocator; }
 }

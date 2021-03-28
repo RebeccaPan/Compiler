@@ -10,6 +10,9 @@ public class IntLiteralNode extends ExprNode {
         this.val = _val;
     }
 
+    public int getVal() { return val; }
+    public void setVal(int val) { this.val = val; }
+
     @Override
     public void accept(ASTVisitor visitor) { visitor.visit(this); }
 }

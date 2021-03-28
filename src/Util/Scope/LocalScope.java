@@ -1,6 +1,7 @@
 package Util.Scope;
 
 import Util.CompilationError;
+import Util.RegIDAllocator;
 import Util.Symbol.ClassSymbol;
 import Util.Symbol.FuncSymbol;
 import Util.Symbol.Symbol;
@@ -15,12 +16,14 @@ public class LocalScope implements ScopeType {
     private Map<String, VarSymbol> varMap;
     private Map<String, FuncSymbol> funcMap;
     private ArrayList<VarSymbol> varList;
+    private RegIDAllocator regIDAllocator;
 
     public LocalScope(ScopeType _outerScope) {
         outerScope = _outerScope;
         varMap = new LinkedHashMap<>();
         funcMap = new LinkedHashMap<>();
         varList = new ArrayList<>();
+        regIDAllocator = _outerScope.getRegIDAllocator();
     }
 
     public ScopeType getOuterScope() { return outerScope; }
@@ -75,4 +78,23 @@ public class LocalScope implements ScopeType {
     public ClassSymbol findClassSymbol(String ID) {
         return outerScope().findClassSymbol(ID);
     }
+
+    @Override
+    public VarSymbol findVarSymbol(String ID) {
+        if (varMap.containsKey(ID)) return varMap.get(ID);
+        return outerScope().findVarSymbol(ID);
+    }
+
+    @Override
+    public boolean existVarLocal(String ID) {
+        return varMap.containsKey(ID);
+    }
+
+    @Override
+    public boolean existFuncLocal(String ID) {
+        return funcMap.containsKey(ID);
+    }
+
+    @Override
+    public RegIDAllocator getRegIDAllocator() { return regIDAllocator; }
 }
