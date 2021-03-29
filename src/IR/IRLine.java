@@ -109,7 +109,7 @@ public class IRLine {
                     case 8 -> "\tli\t" + reg0 + "," + regList.get(1).getID();
                     case 9 -> "\tlui\t" + reg0 + ",%hi(" + regList.get(1).toSASM() + ")\n"
                             + "\taddi\t" + reg0 + "," + reg0 + ",%lo(" + regList.get(1).toSASM() + ")";
-                    default -> throw new IllegalStateException("IRLine - Unexpected value: " + regList.get(1).getType());
+                    default -> "";
                 };
             }
             case RETURN -> str = "\tRETURN";
@@ -121,7 +121,7 @@ public class IRLine {
                     case 1 -> block.LAddr(regList.get(1).getID()) + "(s0)";
                     case 2 -> "%lo(" + regList.get(1).toGASM() + ")(" + reg2 + ")";
                     case 4 -> block.PAddr(regList.get(1).getID()) + "(s0)";
-                    default -> throw new IllegalStateException("IRLine - Unexpected value: " + regList.get(1).getType());
+                    default -> "";
                 };
             }
             case SW -> {
@@ -132,7 +132,7 @@ public class IRLine {
                     case 2 -> "%lo(" + regList.get(1).toGASM() + ")(" + reg2 + ")";
                     case 4 -> block.PAddr(regList.get(1).getID()) + "(s0)";
                     case 7 -> block.PAddr(regList.get(1).getID()) + "(sp)";
-                    default -> throw new IllegalStateException("IRLine - Unexpected value: " + regList.get(1).getType());
+                    default -> "";
                 };
             }
         }
