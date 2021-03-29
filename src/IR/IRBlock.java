@@ -289,7 +289,7 @@ public class IRBlock {
                 case MOVE, NEG, NOT, LOGICNOT, EQ, NEQ, GE, GEQ, LE, LEQ,
                     ADD, SUB, MUL, DIV, MOD, OR, AND, XOR, SHL, SHR,
                     INDEX, LOAD, LOADSTRING, ADDI, LW ->  { // default - func, label, jump, return
-                    allocate_release(line, 0, line.getRegList().size());
+                    allocate_release(line, 1, line.getRegList().size());
                     IRReg curReg = line.getRegList().get(0);
                     if (curReg.getType() == 3) {
                         if (curReg.getID() < 6) {

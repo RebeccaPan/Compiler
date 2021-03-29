@@ -76,8 +76,8 @@ public class IRLine {
             case MOVE  -> str = "\tmv\t" + reg0 + "," + reg1;
             case JUMP  -> str = "\tj\t" + labelStr;
             case CALL  -> str = "\tcall\t" + funcStr;
-            case BNEQ  -> str = "\tbne\t" + reg0 + "," + reg1 + "," + labelStr;
-            case BEQ   -> str = "\tbeq\t" + reg0 + "," + reg1 + "," + labelStr;
+            case BNEQ  -> str = "\tbeq\t" + reg0 + "," + reg1 + "," + labelStr;
+            case BEQ   -> str = "\tbne\t" + reg0 + "," + reg1 + "," + labelStr;
             case NEG   -> str = "\tneg\t" + reg0 + "," + reg1;
             case NOT   -> str = "\tnot\t" + reg0 + "," + reg1;
             case LOGICNOT -> str = "\tseqz\t" + reg0 + "," + reg1;

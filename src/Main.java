@@ -16,10 +16,10 @@ import java.io.PrintStream;
 public class Main {
     public static void main(String[] args) throws Exception {
 //        change relative address here:
-//        String filename = "./testcase/codegen/e1.mx";
+//        String filename = "./testcase/codegen/e2.mx";
         try {
             boolean semantic = false, codegen = false;
-//            InputStream file = new FileInputStream(filename);
+//            InputStream inFile = new FileInputStream(filename);
             InputStream inFile = System.in;
             File outFile = new File("output.s");
             PrintStream stream = new PrintStream(outFile);
@@ -35,7 +35,6 @@ public class Main {
 
             if (codegen) {
                 new IRBuilder(globalScope, blockList).visit(ast);
-                // blockList.print();
                 blockList.initASM();
                 blockList.printASM();
             }
