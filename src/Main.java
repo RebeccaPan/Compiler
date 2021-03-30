@@ -16,7 +16,7 @@ import java.io.PrintStream;
 public class Main {
     public static void main(String[] args) throws Exception {
 //        change relative address here:
-//        String filename = "./testcase/codegen/e2.mx";
+//        String filename = "./testcase/codegen/e9.mx";
         try {
             boolean semantic = false, codegen = false;
 //            InputStream inFile = new FileInputStream(filename);

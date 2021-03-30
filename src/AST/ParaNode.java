@@ -14,6 +14,7 @@ public class ParaNode extends ASTNode {
     }
     public TypeNode getType() { return type; }
     public String getParaID() { return paraID; }
+    public VarSymbol getVarSymbol() { return varSymbol; }
     public void setVarSymbol(VarSymbol varSymbol) {this.varSymbol = varSymbol;}
 
     @Override

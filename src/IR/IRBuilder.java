@@ -25,6 +25,7 @@ public class IRBuilder implements ASTVisitor {
         loopStart = loopEnd = loopNext = 0;
         condEnd = condFalse = 0;
         labelNum = 0;
+        curBlock = new IRBlock("globalBlock", globalScope.getRegIDAllocator(), ++labelNum);
     }
 
     @Override
@@ -77,7 +78,6 @@ public class IRBuilder implements ASTVisitor {
         IRBlock tempBlock = curBlock;
         curBlock = new IRBlock(node.getClassID(), node.getScope().getRegIDAllocator(), ++labelNum);
         node.getVarDefList().forEach(x -> x.accept(this));
-        curBlock = tempBlock;
         curClass = null;
     }
 
@@ -151,13 +151,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(VarDefNode node) {
-        if (curBlock == null) {
-            curBlock = new IRBlock("globalBlock", globalScope.getRegIDAllocator(), ++labelNum);
-            node.getSimpleVarDefList().forEach(x -> x.accept(this));
-            curBlock = null;
-        } else {
-            node.getSimpleVarDefList().forEach(x -> x.accept(this));
-        }
+        node.getSimpleVarDefList().forEach(x -> x.accept(this));
     }
 
     @Override
@@ -182,7 +176,9 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ParaNode node) {
-        node.setReg(curBlock.regIDAllocator.allocate(1));
+        // allocated in Semantic Checker when adding the new VarSymbol
+        // node.setReg(curBlock.regIDAllocator.allocate(1));
+        node.setReg(node.getVarSymbol().getReg());
     }
 
     @Override
