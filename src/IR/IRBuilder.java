@@ -13,7 +13,7 @@ public class IRBuilder implements ASTVisitor {
 
     // the whole global BlockList actually
     private IRBlockList curBlockList;
-    private IRBlock curBlock, mainBlock;
+    private IRBlock curBlock;
 
     private int loopStart, loopEnd, loopNext;
     private int condEnd, condFalse;
@@ -25,8 +25,7 @@ public class IRBuilder implements ASTVisitor {
         loopStart = loopEnd = loopNext = 0;
         condEnd = condFalse = 0;
         labelNum = 0;
-        mainBlock = new IRBlock("main", globalScope.getRegIDAllocator(), ++labelNum);
-        curBlock = mainBlock; // added to curBlockList AFTER geting into main() function
+        curBlock = new IRBlock("globalBlock", globalScope.getRegIDAllocator(), ++labelNum);
     }
 
     @Override
@@ -78,57 +77,12 @@ public class IRBuilder implements ASTVisitor {
         node.getConstructorDefList().forEach(x -> x.accept(this));
         IRBlock tempBlock = curBlock;
         curBlock = new IRBlock(node.getClassID(), node.getScope().getRegIDAllocator(), ++labelNum);
-        curBlockList.addBlock(curBlock);
         node.getVarDefList().forEach(x -> x.accept(this));
         curClass = null;
-        curBlock = tempBlock;
     }
 
     @Override
     public void visit(FuncDefNode node) {
-        IRBlock tempBlock = curBlock;
-        curBlock = (node.getFuncID().equals("main")) ?
-                mainBlock : new IRBlock(node.getFuncID(), node.getScope().getRegIDAllocator(), ++labelNum);
-        curBlockList.addBlock(curBlock);
-        IRLine line = new IRLine(IRLine.OPCODE.FUNC);
-        line.setFuncStr(node.getFuncID());
-        curBlock.addLine(line);
-
-        if (node.getParaList() != null) node.getParaList().accept(this);
-
-        if (curClass != null) { // in class
-            IRReg reg = new IRReg(0, 1, false);
-            line = new IRLine(IRLine.OPCODE.MOVE);
-            line.addReg(reg);
-            line.addReg(new IRReg(10, 0, false));
-            curBlock.addLine(line);
-
-            for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
-                line = new IRLine(IRLine.OPCODE.MOVE);
-                line.addReg(node.getParaList().getParaList().get(i).getReg());
-                if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
-                else line.addReg(new IRReg(i - 5, 4, false));
-                curBlock.addLine(line);
-            }
-        } else { // not in class
-            if (node.getParaList() != null) {
-                for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
-                    line = new IRLine(IRLine.OPCODE.MOVE);
-                    line.addReg(node.getParaList().getParaList().get(i).getReg());
-                    if (i < 6) line.addReg(new IRReg(i + 10, 0, false));
-                    else line.addReg(new IRReg(i - 6, 4, false));
-                    curBlock.addLine(line);
-                }
-            }
-        }
-        node.getSuite().accept(this);
-        curBlock = tempBlock;
-    }
-
-    @Override
-    public void visit(ConstructorDefNode node) {
-        // almost the same as FuncDefNode
-        IRBlock tempBlock = curBlock;
         curBlock = new IRBlock(node.getFuncID(), node.getScope().getRegIDAllocator(), ++labelNum);
         curBlockList.addBlock(curBlock);
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
@@ -151,11 +105,48 @@ public class IRBuilder implements ASTVisitor {
                 else line.addReg(new IRReg(i - 5, 4, false));
                 curBlock.addLine(line);
             }
+            node.getSuite().accept(this);
+        } else { // not in class
+            if (node.getParaList() != null) {
+                for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
+                    line = new IRLine(IRLine.OPCODE.MOVE);
+                    line.addReg(node.getParaList().getParaList().get(i).getReg());
+                    if (i < 6) line.addReg(new IRReg(i + 10, 0, false));
+                    else line.addReg(new IRReg(i - 6, 4, false));
+                    curBlock.addLine(line);
+                }
+            }
+            node.getSuite().accept(this);
+        }
+    }
+
+    @Override
+    public void visit(ConstructorDefNode node) {
+        // almost the same as FuncDefNode
+        curBlock = new IRBlock(node.getFuncID(), node.getScope().getRegIDAllocator(), ++labelNum);
+        curBlockList.addBlock(curBlock);
+        IRLine line = new IRLine(IRLine.OPCODE.FUNC);
+        line.setFuncStr(node.getFuncID());
+        curBlock.addLine(line);
+
+        if (curClass != null) { // in class
+            IRReg reg = new IRReg(0, 1, false);
+            line = new IRLine(IRLine.OPCODE.MOVE);
+            line.addReg(reg);
+            line.addReg(new IRReg(10, 0, false));
+            curBlock.addLine(line);
+
+            for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
+                line = new IRLine(IRLine.OPCODE.MOVE);
+                line.addReg(node.getParaList().getParaList().get(i).getReg());
+                if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
+                else line.addReg(new IRReg(i - 5, 4, false));
+                curBlock.addLine(line);
+            }
+            node.getSuite().accept(this);
         } else {
             throw new CompilationError("IRBuilder - constructor not in class");
         }
-        node.getSuite().accept(this);
-        curBlock = tempBlock;
     }
 
     @Override

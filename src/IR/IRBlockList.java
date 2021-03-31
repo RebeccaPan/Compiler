@@ -7,8 +7,6 @@ public class IRBlockList {
     private ArrayList<Integer> globalList = new ArrayList<>();
     private ArrayList<IRBlock> blockList = new ArrayList<>();
     private ArrayList<String> stringList = new ArrayList<>();
-    private HashMap<String, Integer> classSizeMap = new HashMap<>();
-    private boolean withRet;
 
     public IRBlockList() {
         // left empty
@@ -72,6 +70,4 @@ public class IRBlockList {
         System.out.print(str);
         blockList.forEach(IRBlock::printASM);
     }
-
-    public boolean isWithRet() { return withRet; }
 }
