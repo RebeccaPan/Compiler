@@ -5,6 +5,8 @@ import Util.CompilationError;
 import Util.Scope.*;
 import Util.Type.*;
 
+import java.util.ArrayList;
+
 import static Util.Constants.*;
 
 public class IRBuilder implements ASTVisitor {
@@ -19,13 +21,15 @@ public class IRBuilder implements ASTVisitor {
     private int condEnd, condFalse;
     private int labelNum;
 
+    private ArrayList<ASTNode> globalVarDefList = new ArrayList<>();
+
     public IRBuilder(GlobalScope _globalScope, IRBlockList _curBlockList) {
         globalScope = _globalScope;
         curBlockList = _curBlockList;
         loopStart = loopEnd = loopNext = 0;
         condEnd = condFalse = 0;
         labelNum = 0;
-        curBlock = new IRBlock("globalBlock", globalScope.getRegIDAllocator(), ++labelNum);
+//        curBlock = new IRBlock("globalBlock", globalScope.getRegIDAllocator(), ++labelNum);
     }
 
     @Override
@@ -62,7 +66,10 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ProgramNode node) {
-        node.getDefNodeList().forEach(x -> x.accept(this));
+        for (DefNode defNode : node.getDefNodeList()) {
+            if (defNode instanceof VarDefNode) globalVarDefList.add(defNode); // accept later in main func
+            else defNode.accept(this);
+        }
     }
 
     @Override
@@ -75,8 +82,7 @@ public class IRBuilder implements ASTVisitor {
         curClass = new ClassType(node.getClassID());
         node.getFuncDefList().forEach(x -> x.accept(this));
         node.getConstructorDefList().forEach(x -> x.accept(this));
-        IRBlock tempBlock = curBlock;
-        curBlock = new IRBlock(node.getClassID(), node.getScope().getRegIDAllocator(), ++labelNum);
+//        curBlock = new IRBlock(node.getClassID(), node.getScope().getRegIDAllocator(), ++labelNum);
         node.getVarDefList().forEach(x -> x.accept(this));
         curClass = null;
     }
@@ -90,6 +96,8 @@ public class IRBuilder implements ASTVisitor {
         curBlock.addLine(line);
 
         if (node.getParaList() != null) node.getParaList().accept(this);
+
+        if (node.getFuncID().equals("main")) globalVarDefList.forEach(x -> x.accept(this));
 
         if (curClass != null) { // in class
             IRReg reg = new IRReg(0, 1, false);
@@ -117,6 +125,16 @@ public class IRBuilder implements ASTVisitor {
                 }
             }
             node.getSuite().accept(this);
+            if (node.getFuncID().equals("main") && curBlockList.mainNeedRet) {
+                // add `return 0` to main func
+                line = new IRLine(IRLine.OPCODE.MOVE);
+                line.addReg(new IRReg(10, 0, false));
+                line.addReg(CONST_NULL);
+                curBlock.addLine(line);
+                line = new IRLine(IRLine.OPCODE.JUMP);
+                line.setLabel(curBlock.getRetLabel());
+                curBlock.addLine(line);
+            }
         }
     }
 
@@ -128,6 +146,8 @@ public class IRBuilder implements ASTVisitor {
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
         line.setFuncStr(node.getFuncID());
         curBlock.addLine(line);
+
+        if (node.getParaList() != null) node.getParaList().accept(this);
 
         if (curClass != null) { // in class
             IRReg reg = new IRReg(0, 1, false);
@@ -667,8 +687,8 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(AssignExprNode node) {
-        node.getLhs().accept(this);
         node.getRhs().accept(this);
+        node.getLhs().accept(this);
         IRLine line = new IRLine(IRLine.OPCODE.MOVE);
         line.addReg(node.getLhs().getReg());
         line.addReg(node.getRhs().getReg());

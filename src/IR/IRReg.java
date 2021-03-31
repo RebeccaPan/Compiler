@@ -7,6 +7,7 @@ public class IRReg {
 
     public IRReg(int _ID, int _type, boolean _isPtr) {
         ID = _ID; type = _type; isPtr = _isPtr;
+        if (isPtr) type = 6;
     }
 
     public void print() {

@@ -502,6 +502,9 @@ public class SemanticChecker implements ASTVisitor {
             node.getRetExpr().assertIsVal(node.getLocation());
             curFunc.getType().assignable(node.getRetExpr().getType(), node.getLocation());
         }
+        if (curFunc.getID().equals("main")) {
+            if (node.isWithRet()) curBlockList.mainNeedRet = false;
+        }
     }
 
     @Override
