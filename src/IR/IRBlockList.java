@@ -38,11 +38,11 @@ public class IRBlockList {
     public void initASM() {
         blockList.forEach(IRBlock::fulfill);
         blockList.forEach(IRBlock::allocate);
+        blockList.forEach(IRBlock::fulfillLocal);
 //        System.out.println("----------------------");
 //        System.out.println("After all these ordeal");
 //        print();
 //        System.out.println("----------------------");
-        blockList.forEach(IRBlock::fulfillLocal);
         blockList.forEach(IRBlock::allocateLocal);
         blockList.forEach(IRBlock::trim);
         blockList.forEach(IRBlock::calcRAM);
