@@ -253,9 +253,9 @@ my_array_size:
 	jr	ra
 	.size	my_array_size, .-my_array_size
 	.align	2
-	.globl	my_c_string_substring
-	.type	my_c_string_substring, @function
-my_c_string_substring:
+	.globl	substring
+	.type	substring, @function
+substring:
 	addi	sp,sp,-48
 	sw	ra,44(sp)
 	sw	s0,40(sp)
@@ -294,11 +294,11 @@ my_c_string_substring:
 	lw	s0,40(sp)
 	addi	sp,sp,48
 	jr	ra
-	.size	my_c_string_substring, .-my_c_string_substring
+	.size	substring, .-substring
 	.align	2
-	.globl	my_c_string_parseInt
-	.type	my_c_string_parseInt, @function
-my_c_string_parseInt:
+	.globl	parseInt
+	.type	parseInt, @function
+parseInt:
 	addi	sp,sp,-48
 	sw	ra,44(sp)
 	sw	s0,40(sp)
@@ -316,11 +316,11 @@ my_c_string_parseInt:
 	lw	s0,40(sp)
 	addi	sp,sp,48
 	jr	ra
-	.size	my_c_string_parseInt, .-my_c_string_parseInt
+	.size	parseInt, .-parseInt
 	.align	2
-	.globl	my_c_string_ord
-	.type	my_c_string_ord, @function
-my_c_string_ord:
+	.globl	ord
+	.type	ord, @function
+ord:
 	addi	sp,sp,-32
 	sw	s0,28(sp)
 	addi	s0,sp,32
@@ -334,11 +334,11 @@ my_c_string_ord:
 	lw	s0,28(sp)
 	addi	sp,sp,32
 	jr	ra
-	.size	my_c_string_ord, .-my_c_string_ord
+	.size	ord, .-ord
 	.align	2
-	.globl	my_c_string_length
-	.type	my_c_string_length, @function
-my_c_string_length:
+	.globl	length
+	.type	length, @function
+length:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
 	sw	s0,24(sp)
@@ -352,7 +352,7 @@ my_c_string_length:
 	lw	s0,24(sp)
 	addi	sp,sp,32
 	jr	ra
-	.size	my_c_string_length, .-my_c_string_length
+	.size	length, .-length
 	.align	2
 	.globl	my_string_plus
 	.type	my_string_plus, @function

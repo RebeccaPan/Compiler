@@ -543,7 +543,15 @@ public class IRBuilder implements ASTVisitor {
         if (inClass) {
             IRLine line = new IRLine(IRLine.OPCODE.MOVE);
             line.addReg(new IRReg(0, 3, false));
-            line.addReg(node.getParentReg() != null ? node.getExpr().getReg() : new IRReg(0, 1, false));
+            if (node.getFuncSymbol().getID().equals("my_array_size")) {
+                ( (ClassMemberExprNode) node.getExpr() ).getExpr().accept(this);
+                node.getExpr().setReg(( (ClassMemberExprNode) node.getExpr() ).getExpr().getReg());
+                line.addReg(node.getExpr().getReg());
+            } else {
+                line.addReg(node.getParentReg() != null
+                        ? node.getExpr().getReg()
+                        : new IRReg(0, 1, false));
+            }
             curBlock.addLine(line);
         }
         IRLine line = new IRLine(IRLine.OPCODE.CALL);
@@ -626,7 +634,7 @@ public class IRBuilder implements ASTVisitor {
 
         node.getLhs().accept(this);
         node.getRhs().accept(this);
-        if (node.getLhs().getType().getType().equals("String") && node.getRhs().getType().getType().equals("String")) {
+        if (node.getLhs().getType() instanceof StringType && node.getRhs().getType() instanceof StringType) {
             IRLine line = new IRLine(IRLine.OPCODE.MOVE);
             line.addReg(new IRReg(1, 3, false));
             line.addReg(node.getRhs().getReg());

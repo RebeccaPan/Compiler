@@ -64,7 +64,7 @@ public class SemanticChecker implements ASTVisitor {
         ToString.setScope(ToStringScope);
         curScope.addFunc(ToString);
 
-        FuncSymbol ArraySize = new FuncSymbol("#size#", new LocalScope(curScope), new IntType(), virtualLoc, false);
+        FuncSymbol ArraySize = new FuncSymbol("my_array_size", new LocalScope(curScope), new IntType(), virtualLoc, true);
         curScope.addFunc(ArraySize);
 
         // Print & PrintLn with VarSymbol StrPrint(Ln) in local scope
@@ -562,7 +562,7 @@ public class SemanticChecker implements ASTVisitor {
             if (node.getID().getID().equals("size")) {
                 node.setType(new IntType());
                 node.setExprCat(ExprNode.ExprCat.Func);
-                node.setSymbol(curScope.findSymbol("#size#"));
+                node.setSymbol(curScope.findSymbol("my_array_size"));
             }
             else throw new CompilationError("Semantic - class member expr error", node.getLocation());
         }
