@@ -209,7 +209,7 @@ public class IRBlock {
         lineList = newLineList;
     }
 
-    private boolean[] isFree = new boolean[32];
+    private boolean[] isFree;
     private int[] used, firstPos, lastPos;
     private IRReg[] usedRegs, usedLRegs;
 
@@ -270,6 +270,10 @@ public class IRBlock {
         used = new int[curSize];
         firstPos = new int[curSize];
         lastPos = new int[curSize];
+        usedRegs = new IRReg[curSize];
+        usedLRegs = new IRReg[curSize];
+        isFree = new boolean[32];
+        for (int i = 0; i < 32; ++i) isFree[i] = (i >= 10 && i <= 15);
         for (int i = 0; i < lineList.size(); ++i) {
             IRLine curLine = lineList.get(i);
             for (int j = 0; j < curLine.getRegList().size(); ++j) {
@@ -281,9 +285,6 @@ public class IRBlock {
                 }
             }
         }
-        usedRegs = new IRReg[curSize];
-        usedLRegs = new IRReg[curSize];
-        for (int i = 0; i < 32; ++i) isFree[i] = (i >= 10 && i <= 15);
         for (IRLine line : lineList) {
             switch (line.getOpcode()) {
                 case MOVE, NEG, NOT, LOGICNOT, EQ, NEQ, GE, GEQ, LE, LEQ,
@@ -308,7 +309,10 @@ public class IRBlock {
                 case CALL -> {
                     for (int i = 0; i < curSize; ++i) {
                         if (used[i] == 0 || usedRegs[i] == null) continue;
-                        usedRegs[i] = regIDAllocator.allocate(1);
+                        IRReg tempReg = regIDAllocator.allocate(1);
+                        usedRegs[i].setID(tempReg.getID());
+                        usedRegs[i].setType(tempReg.getType());
+                        usedRegs[i].setPtr(tempReg.isPtr());
                         used[i] = 0;
                     }
                     for (int i = 10; i <= 15; ++i) isFree[i] = true;
@@ -321,8 +325,7 @@ public class IRBlock {
         used = new int[curSize];
         firstPos = new int[curSize];
         lastPos = new int[curSize];
-        for (int i = 0; i < lineList.size(); ++i) {
-            IRLine curLine = lineList.get(i);
+        for (IRLine curLine : lineList) {
             for (int j = 0; j < curLine.getRegList().size(); ++j) {
                 IRReg curReg = curLine.getRegList().get(j);
                 if (curReg.getType() == 5) {

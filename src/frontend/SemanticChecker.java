@@ -31,9 +31,9 @@ public class SemanticChecker implements ASTVisitor {
 
         // - set scope of string after creating FuncSymbol length, substring, parseInt, ord
         LocalScope StringScope = new LocalScope(curScope);
-        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc, false);
+        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc, true);
         StringScope.addFunc(Length);
-        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc, false);
+        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc, true);
         LocalScope SubstringScope = new LocalScope(string.getScope());
         VarSymbol Left  = new VarSymbol("left", SubstringScope, new IntType(), Substring.getLoc(), 1);
         VarSymbol Right = new VarSymbol("right", SubstringScope, new IntType(), Substring.getLoc(), 1);
@@ -41,9 +41,9 @@ public class SemanticChecker implements ASTVisitor {
         SubstringScope.addVar(Right);
         Substring.setScope(SubstringScope);
         StringScope.addFunc(Substring);
-        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc, false);
+        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc, true);
         StringScope.addFunc(ParseInt);
-        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc, false);
+        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc, true);
         LocalScope OrdScope = new LocalScope(curScope);
         VarSymbol Pos = new VarSymbol("pos", OrdScope, new IntType(), virtualLoc, 1);
         OrdScope.addVar(Pos);
@@ -57,7 +57,7 @@ public class SemanticChecker implements ASTVisitor {
         curScope.addClass(Void);
 
         // toString, size
-        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, false);
+        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, true);
         LocalScope ToStringScope = new LocalScope(curScope);
         VarSymbol ItoStr = new VarSymbol("i", ToStringScope, new IntType(), virtualLoc, 1);
         ToStringScope.addVar(ItoStr);
@@ -553,6 +553,9 @@ public class SemanticChecker implements ASTVisitor {
             ClassSymbol classSymbol = curScope.findClassSymbol(node.getExpr().getType().getType());
             Symbol symbol = classSymbol.getScope().findSymbol(node.getID().getID());
             node.setType(symbol.getType());
+            ScopeType globalScope = curScope;
+            while (globalScope instanceof LocalScope) globalScope = globalScope.outerScope();
+            node.getID().setScope(classSymbol.getScope());
             node.setSymbol(symbol);
             if (symbol instanceof FuncSymbol) node.setExprCat(ExprNode.ExprCat.Func);
             else if (symbol instanceof VarSymbol) node.setExprCat(ExprNode.ExprCat.LVal);

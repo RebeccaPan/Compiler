@@ -106,12 +106,14 @@ public class IRBuilder implements ASTVisitor {
             line.addReg(new IRReg(10, 0, false));
             curBlock.addLine(line);
 
-            for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
-                line = new IRLine(IRLine.OPCODE.MOVE);
-                line.addReg(node.getParaList().getParaList().get(i).getReg());
-                if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
-                else line.addReg(new IRReg(i - 5, 4, false));
-                curBlock.addLine(line);
+            if (node.getParaList() != null) {
+                for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
+                    line = new IRLine(IRLine.OPCODE.MOVE);
+                    line.addReg(node.getParaList().getParaList().get(i).getReg());
+                    if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
+                    else line.addReg(new IRReg(i - 5, 4, false));
+                    curBlock.addLine(line);
+                }
             }
             node.getSuite().accept(this);
         } else { // not in class
@@ -124,7 +126,7 @@ public class IRBuilder implements ASTVisitor {
                     curBlock.addLine(line);
                 }
             }
-            node.getSuite().accept(this);
+            if (node.getSuite() != null) node.getSuite().accept(this);
             if (node.getFuncID().equals("main") && curBlockList.mainNeedRet) {
                 // add `return 0` to main func
                 line = new IRLine(IRLine.OPCODE.MOVE);
@@ -156,14 +158,16 @@ public class IRBuilder implements ASTVisitor {
             line.addReg(new IRReg(10, 0, false));
             curBlock.addLine(line);
 
-            for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
-                line = new IRLine(IRLine.OPCODE.MOVE);
-                line.addReg(node.getParaList().getParaList().get(i).getReg());
-                if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
-                else line.addReg(new IRReg(i - 5, 4, false));
-                curBlock.addLine(line);
+            if (node.getParaList() != null) {
+                for (int i = 0; i < node.getParaList().getParaList().size(); ++i) {
+                    line = new IRLine(IRLine.OPCODE.MOVE);
+                    line.addReg(node.getParaList().getParaList().get(i).getReg());
+                    if (i < 5) line.addReg(new IRReg(i + 11, 0, false));
+                    else line.addReg(new IRReg(i - 5, 4, false));
+                    curBlock.addLine(line);
+                }
             }
-            node.getSuite().accept(this);
+            if (node.getSuite() != null) node.getSuite().accept(this);
         } else {
             throw new CompilationError("IRBuilder - constructor not in class");
         }
@@ -530,6 +534,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(CallFuncExprNode node) {
+        node.getExpr().accept(this);
         if (node.getExprList() != null) node.getExprList().accept(this);
         boolean inClass = node.getFuncSymbol().isInClass();
         if (node.getExprList() != null) {
@@ -548,7 +553,7 @@ public class IRBuilder implements ASTVisitor {
                 node.getExpr().setReg(( (ClassMemberExprNode) node.getExpr() ).getExpr().getReg());
                 line.addReg(node.getExpr().getReg());
             } else {
-                line.addReg(node.getParentReg() != null
+                line.addReg(node.getExpr() instanceof ClassMemberExprNode
                         ? node.getExpr().getReg()
                         : new IRReg(0, 1, false));
             }
@@ -739,6 +744,7 @@ public class IRBuilder implements ASTVisitor {
                         node.setReg(new IRReg(node.getReg().getID(), node.getReg().getType(), true));
                     }
                 }
+                break;
             } else {
                 if (curScope.existFuncLocal(node.getID())) {
                     if (node.getParentReg() != null) node.setReg(node.getParentReg());
