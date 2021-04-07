@@ -2,7 +2,6 @@ import AST.*;
 import IR.IRBlockList;
 import IR.IRBuilder;
 import Util.Scope.GlobalScope;
-import Util.Scope.ScopeType;
 import frontend.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

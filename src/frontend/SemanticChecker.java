@@ -2,7 +2,6 @@ package frontend;
 
 import AST.*;
 import IR.IRBlockList;
-import IR.IRReg;
 import Util.CompilationError;
 import Util.LocationType;
 import Util.Scope.*;
