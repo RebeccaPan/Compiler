@@ -56,7 +56,7 @@ public class SemanticChecker implements ASTVisitor {
         curScope.addClass(Void);
 
         // toString, size
-        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, true);
+        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, false);
         LocalScope ToStringScope = new LocalScope(curScope);
         VarSymbol ItoStr = new VarSymbol("i", ToStringScope, new IntType(), virtualLoc, 1);
         ToStringScope.addVar(ItoStr);
