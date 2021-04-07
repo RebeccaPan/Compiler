@@ -552,8 +552,6 @@ public class SemanticChecker implements ASTVisitor {
             ClassSymbol classSymbol = curScope.findClassSymbol(node.getExpr().getType().getType());
             Symbol symbol = classSymbol.getScope().findSymbol(node.getID().getID());
             node.setType(symbol.getType());
-            ScopeType globalScope = curScope;
-            while (globalScope instanceof LocalScope) globalScope = globalScope.outerScope();
             node.getID().setScope(classSymbol.getScope());
             node.setSymbol(symbol);
             if (symbol instanceof FuncSymbol) node.setExprCat(ExprNode.ExprCat.Func);
@@ -565,6 +563,7 @@ public class SemanticChecker implements ASTVisitor {
                 node.setType(new IntType());
                 node.setExprCat(ExprNode.ExprCat.Func);
                 node.setSymbol(curScope.findSymbol("my_array_size"));
+                node.getID().setScope(node.getSymbol().getScope());
             }
             else throw new CompilationError("Semantic - class member expr error", node.getLocation());
         }
