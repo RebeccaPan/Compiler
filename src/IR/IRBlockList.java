@@ -35,6 +35,7 @@ public class IRBlockList {
 
     public void initASM() {
         blockList.forEach(IRBlock::fulfill);
+//        print();
         blockList.forEach(IRBlock::allocate);
 //        System.out.println("----------------------");
 //        System.out.println("After all these ordeal");
