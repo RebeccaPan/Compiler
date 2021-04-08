@@ -79,5 +79,10 @@ public class GlobalScope implements ScopeType {
     }
 
     @Override
+    public boolean existClassLocal(String ID) {
+        return classMap.containsKey(ID);
+    }
+
+    @Override
     public RegIDAllocator getRegIDAllocator() { return regIDAllocator; }
 }

@@ -30,9 +30,9 @@ public class SemanticChecker implements ASTVisitor {
 
         // - set scope of string after creating FuncSymbol length, substring, parseInt, ord
         LocalScope StringScope = new LocalScope(curScope);
-        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc, true);
+        FuncSymbol Length = new FuncSymbol("length", new LocalScope(string.getScope()), new IntType(), virtualLoc, true, string.getID());
         StringScope.addFunc(Length);
-        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc, true);
+        FuncSymbol Substring = new FuncSymbol("substring", new LocalScope(curScope), new StringType(), virtualLoc, true, string.getID());
         LocalScope SubstringScope = new LocalScope(string.getScope());
         VarSymbol Left  = new VarSymbol("left", SubstringScope, new IntType(), Substring.getLoc(), 1);
         VarSymbol Right = new VarSymbol("right", SubstringScope, new IntType(), Substring.getLoc(), 1);
@@ -40,9 +40,9 @@ public class SemanticChecker implements ASTVisitor {
         SubstringScope.addVar(Right);
         Substring.setScope(SubstringScope);
         StringScope.addFunc(Substring);
-        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc, true);
+        FuncSymbol ParseInt = new FuncSymbol("parseInt", new LocalScope(curScope), new IntType(), virtualLoc, true, string.getID());
         StringScope.addFunc(ParseInt);
-        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc, true);
+        FuncSymbol Ord = new FuncSymbol("ord", new LocalScope(curScope), new IntType(), virtualLoc, true, string.getID());
         LocalScope OrdScope = new LocalScope(curScope);
         VarSymbol Pos = new VarSymbol("pos", OrdScope, new IntType(), virtualLoc, 1);
         OrdScope.addVar(Pos);
@@ -56,50 +56,50 @@ public class SemanticChecker implements ASTVisitor {
         curScope.addClass(Void);
 
         // toString, size
-        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, false);
+        FuncSymbol ToString = new FuncSymbol("toString", new LocalScope(curScope), new StringType(), virtualLoc, false, null);
         LocalScope ToStringScope = new LocalScope(curScope);
         VarSymbol ItoStr = new VarSymbol("i", ToStringScope, new IntType(), virtualLoc, 1);
         ToStringScope.addVar(ItoStr);
         ToString.setScope(ToStringScope);
         curScope.addFunc(ToString);
 
-        FuncSymbol ArraySize = new FuncSymbol("my_array_size", new LocalScope(curScope), new IntType(), virtualLoc, true);
+        FuncSymbol ArraySize = new FuncSymbol("my_array_size", new LocalScope(curScope), new IntType(), virtualLoc, true, null);
         curScope.addFunc(ArraySize);
 
         // Print & PrintLn with VarSymbol StrPrint(Ln) in local scope
-        FuncSymbol Print = new FuncSymbol("print", new LocalScope(curScope), new VoidType(), virtualLoc, false);
+        FuncSymbol Print = new FuncSymbol("print", new LocalScope(curScope), new VoidType(), virtualLoc, false, null);
         LocalScope PrintScope = new LocalScope(curScope);
         VarSymbol StrPrint = new VarSymbol("str", PrintScope, new StringType(), virtualLoc, 1);
         PrintScope.addVar(StrPrint);
         Print.setScope(PrintScope);
         curScope.addFunc(Print);
 
-        FuncSymbol PrintLn = new FuncSymbol("println", new LocalScope(curScope), new VoidType(), virtualLoc, false);
+        FuncSymbol PrintLn = new FuncSymbol("println", new LocalScope(curScope), new VoidType(), virtualLoc, false, null);
         LocalScope PrintLnScope = new LocalScope(curScope);
         VarSymbol StrPrintLn = new VarSymbol("str", PrintLnScope, new StringType(), virtualLoc, 1);
         PrintLnScope.addVar(StrPrintLn);
         PrintLn.setScope(PrintLnScope);
         curScope.addFunc(PrintLn);
 
-        FuncSymbol GetStr = new FuncSymbol("getString", new LocalScope(curScope), new StringType(), virtualLoc, false);
+        FuncSymbol GetStr = new FuncSymbol("getString", new LocalScope(curScope), new StringType(), virtualLoc, false, null);
         curScope.addFunc(GetStr);
 
         // PrintInt & PrintLnInt with VarSymbol IntPrintLn in local scope
-        FuncSymbol PrintInt = new FuncSymbol("printInt", new LocalScope(curScope), new VoidType(), virtualLoc, false);
+        FuncSymbol PrintInt = new FuncSymbol("printInt", new LocalScope(curScope), new VoidType(), virtualLoc, false, null);
         LocalScope PrintIntScope = new LocalScope(curScope);
         VarSymbol IntPrint = new VarSymbol("num", PrintIntScope, new IntType(), virtualLoc, 1);
         PrintIntScope.addVar(IntPrint);
         PrintInt.setScope(PrintIntScope);
         curScope.addFunc(PrintInt);
 
-        FuncSymbol PrintIntLn = new FuncSymbol("printlnInt", new LocalScope(curScope), new VoidType(), virtualLoc, false);
+        FuncSymbol PrintIntLn = new FuncSymbol("printlnInt", new LocalScope(curScope), new VoidType(), virtualLoc, false, null);
         LocalScope PrintIntLnScope = new LocalScope(curScope);
         VarSymbol IntPrintLn = new VarSymbol("num", PrintIntLnScope, new IntType(), virtualLoc, 1);
         PrintIntLnScope.addVar(IntPrintLn);
         PrintIntLn.setScope(PrintIntLnScope);
         curScope.addFunc(PrintIntLn);
 
-        FuncSymbol GetInt = new FuncSymbol("getInt", new LocalScope(curScope), new IntType(), virtualLoc, false);
+        FuncSymbol GetInt = new FuncSymbol("getInt", new LocalScope(curScope), new IntType(), virtualLoc, false, null);
         curScope.addFunc(GetInt);
     }
 
@@ -162,7 +162,7 @@ public class SemanticChecker implements ASTVisitor {
                             curNode.getFuncID(),
                             new LocalScope(curScope),
                             null,
-                            curNode.getLocation(), true );
+                            curNode.getLocation(), true, ((ClassDefNode) cur).getClassID() );
                     curScope.addFunc(funcSymbol);
                     Type type = curScope.findSymbol(curNode.getType().getSimpleTypeNode().getType()).getType();
                     funcSymbol.setType( (curNode.getType().getDim() == 0) ? type : new ArrayType(type, curNode.getType().getDim()) );
@@ -186,7 +186,7 @@ public class SemanticChecker implements ASTVisitor {
                             curNode.getFuncID(),
                             new LocalScope(curScope),
                             new VoidType(),
-                            curNode.getLocation(), true );
+                            curNode.getLocation(), true, ((ClassDefNode) cur).getClassID() );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curNode.setFuncSymbol(constructorSymbol);
@@ -204,7 +204,7 @@ public class SemanticChecker implements ASTVisitor {
                             classDefNode.getClassID(),
                             new LocalScope(curScope),
                             null,
-                            classDefNode.getLocation(), true );
+                            classDefNode.getLocation(), true, ((ClassDefNode) cur).getClassID() );
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curScope = constructorSymbol.getScope();
@@ -234,7 +234,7 @@ public class SemanticChecker implements ASTVisitor {
                         ((FuncDefNode) curNode).getFuncID(),
                         new LocalScope(curScope),
                         null,
-                        curNode.getLocation(), false );
+                        curNode.getLocation(), false, null );
                 curScope.addFunc(funcSymbol);
                 Type type = curScope.findSymbol(((FuncDefNode) curNode).getType().getSimpleTypeNode().getType()).getType();
                 funcSymbol.setType( (((FuncDefNode) curNode).getType().getDim() == 0) ? type : new ArrayType(type, ((FuncDefNode) curNode).getType().getDim()) );

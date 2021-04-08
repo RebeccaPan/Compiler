@@ -61,7 +61,11 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(NullLiteralNode node) {
-        // do nothing
+        node.setReg(curBlock.regIDAllocator.allocate(5));
+        IRLine line = new IRLine(IRLine.OPCODE.LOAD);
+        line.addReg(node.getReg());
+        line.addReg(CONST_ZERO);
+        curBlock.addLine(line);
     }
 
     @Override
@@ -89,10 +93,15 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(FuncDefNode node) {
-        curBlock = new IRBlock(node.getFuncID(), node.getScope().getRegIDAllocator(), ++labelNum);
+        String fullFuncName = node.getFuncSymbol().isInClass() ?
+                "my_c_" + node.getFuncSymbol().getClassID() + "_" + node.getFuncSymbol().getID()
+                : node.getFuncID();
+        // manually check size()
+        if (node.getFuncSymbol().isInClass() && node.getFuncSymbol().getClassID() == null) fullFuncName = "my_array_size";
+        curBlock = new IRBlock(fullFuncName, node.getScope().getRegIDAllocator(), ++labelNum);
         curBlockList.addBlock(curBlock);
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
-        line.setFuncStr(node.getFuncID());
+        line.setFuncStr(fullFuncName);
         curBlock.addLine(line);
 
         if (node.getParaList() != null) node.getParaList().accept(this);
@@ -142,11 +151,17 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ConstructorDefNode node) {
+        if (node.getSuite() == null) return; // empty constructor
         // almost the same as FuncDefNode
-        curBlock = new IRBlock(node.getFuncID(), node.getScope().getRegIDAllocator(), ++labelNum);
+        String fullFuncName = node.getFuncSymbol().isInClass() ?
+                "my_c_" + node.getFuncSymbol().getClassID() + "_" + node.getFuncSymbol().getID()
+                : node.getFuncID();
+        // manually check size()
+        if (node.getFuncSymbol().isInClass() && node.getFuncSymbol().getClassID() == null) fullFuncName = "my_array_size";
+        curBlock = new IRBlock(fullFuncName, node.getScope().getRegIDAllocator(), ++labelNum);
         curBlockList.addBlock(curBlock);
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
-        line.setFuncStr(node.getFuncID());
+        line.setFuncStr(fullFuncName);
         curBlock.addLine(line);
 
         if (node.getParaList() != null) node.getParaList().accept(this);
@@ -278,7 +293,14 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addLine(line);
             return reg;
         } else {
-            if (node.getType() instanceof ClassType) {
+            ScopeType tempScope = node.getScope();
+            while (tempScope instanceof LocalScope) tempScope = tempScope.outerScope();
+            if (node.getType() instanceof ClassType
+            || (node.getType() instanceof ArrayType
+                && ((ArrayType) node.getType()).getBaseType() instanceof ClassType
+                && tempScope.existClassLocal(
+                    ((ClassType) ((ArrayType) node.getType()).getBaseType()).getClassID() )
+                && node.getType().getDim() == node.getDimExprList().size())) {
                 IRLine line = new IRLine(IRLine.OPCODE.LOAD);
                 line.addReg(new IRReg(10, 0, false));
                 line.addReg(new IRReg(curBlock.regIDAllocator.size(8) + 1, 8, false));
@@ -294,8 +316,7 @@ public class IRBuilder implements ASTVisitor {
                 line.addReg(new IRReg(10, 0, false));
                 curBlock.addLine(line);
 
-                ScopeType curScope = globalScope;
-                if (curScope.existFuncLocal(node.getType().getType())) {
+                if (tempScope.existFuncLocal(node.getType().getType())) {
                     line = new IRLine(IRLine.OPCODE.CALL);
                     line.setFuncStr("my_c_" + node.getType().getType() + "_" + node.getType().getType());
                     curBlock.addLine(line);
@@ -560,7 +581,13 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addLine(line);
         }
         IRLine line = new IRLine(IRLine.OPCODE.CALL);
-        line.setFuncStr(node.getFuncSymbol().getID());
+        String fullFuncName = inClass ?
+                "my_c_" + node.getFuncSymbol().getClassID() + "_" + node.getFuncSymbol().getID()
+                : node.getFuncSymbol().getID();
+        // manually check size()
+        if (node.getFuncSymbol().isInClass() && node.getFuncSymbol().getClassID() == null) fullFuncName = "my_array_size";
+        line.setFuncStr(fullFuncName);
+//        line.setFuncStr(node.getFuncSymbol().getID());
         curBlock.addLine(line);
 
         node.setReg(curBlock.regIDAllocator.allocate(5));

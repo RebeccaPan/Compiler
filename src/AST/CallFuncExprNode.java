@@ -14,7 +14,7 @@ public class CallFuncExprNode extends ExprNode {
     }
     public ExprNode getExpr() { return expr; }
     public ExprListNode getExprList() { return exprList; }
-    public Symbol getFuncSymbol() { return funcSymbol; }
+    public FuncSymbol getFuncSymbol() { return funcSymbol; }
     public void setFuncSymbol(FuncSymbol funcSymbol) { this.funcSymbol = funcSymbol; }
 
     @Override

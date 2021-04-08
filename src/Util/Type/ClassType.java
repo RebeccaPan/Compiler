@@ -22,4 +22,6 @@ public class ClassType implements Type {
         if (otherType.getType().equals(classID) || otherType.getType().equals("null")) return;
         throw new CompilationError("Class Type not comparable with " + otherType.getType(), location);
     }
+
+    public String getClassID() { return classID; }
 }

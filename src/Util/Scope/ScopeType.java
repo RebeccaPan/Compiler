@@ -15,6 +15,7 @@ public interface ScopeType {
     VarSymbol findVarSymbol(String ID);
     boolean existVarLocal(String ID);
     boolean existFuncLocal(String ID);
+    boolean existClassLocal(String ID);
     RegIDAllocator getRegIDAllocator();
 
 }

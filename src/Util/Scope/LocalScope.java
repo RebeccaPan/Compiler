@@ -15,6 +15,7 @@ public class LocalScope implements ScopeType {
     private ScopeType outerScope;
     private Map<String, VarSymbol> varMap;
     private Map<String, FuncSymbol> funcMap;
+    private Map<String, String> funcNameMap;
     private ArrayList<VarSymbol> varList;
     private RegIDAllocator regIDAllocator;
 
@@ -93,6 +94,11 @@ public class LocalScope implements ScopeType {
     @Override
     public boolean existFuncLocal(String ID) {
         return funcMap.containsKey(ID);
+    }
+
+    @Override
+    public boolean existClassLocal(String ID) {
+        return false;
     }
 
     @Override
