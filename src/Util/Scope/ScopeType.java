@@ -13,9 +13,10 @@ public interface ScopeType {
     Symbol findSymbol(String ID);
     ClassSymbol findClassSymbol(String ID);
     VarSymbol findVarSymbol(String ID);
+    int findVarIndexLocal(String ID);
     boolean existVarLocal(String ID);
     boolean existFuncLocal(String ID);
     boolean existClassLocal(String ID);
+    int getVarSize();
     RegIDAllocator getRegIDAllocator();
-
 }

@@ -303,7 +303,10 @@ public class IRBuilder implements ASTVisitor {
                 && node.getType().getDim() == node.getDimExprList().size())) {
                 IRLine line = new IRLine(IRLine.OPCODE.LOAD);
                 line.addReg(new IRReg(10, 0, false));
-                line.addReg(new IRReg(curBlock.regIDAllocator.size(8) + 1, 8, false));
+                Type type = node.getType();
+                if (type instanceof ArrayType) type = ((ArrayType) type).getBaseType();
+                line.addReg(new IRReg(4 * curBlockList.getClassVarNum(type.getType()),
+                                8, false));
                 curBlock.addLine(line);
 
                 line = new IRLine(IRLine.OPCODE.CALL);
@@ -750,7 +753,7 @@ public class IRBuilder implements ASTVisitor {
                     node.setReg(curBlock.regIDAllocator.allocate(5));
                     IRLine line = new IRLine(IRLine.OPCODE.LOAD);
                     line.addReg(node.getReg());
-                    line.addReg(new IRReg(curScope.findVarSymbol(node.getID()).getReg().getID(), 8, false)); // symbol.reg
+                    line.addReg(new IRReg(curScope.findVarIndexLocal(node.getID()), 8, false));
                     curBlock.addLine(line);
                     node.setInClass(true);
                 } else {

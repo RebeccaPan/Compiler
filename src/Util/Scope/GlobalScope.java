@@ -12,12 +12,15 @@ public class GlobalScope implements ScopeType {
     private Map<String, FuncSymbol> funcMap;
     private Map<String, ClassSymbol> classMap;
     public RegIDAllocator regIDAllocator;
+    private Map<String, Integer> varIndex;
+    private int index;
 
     public GlobalScope() {
         varMap = new LinkedHashMap<>();
         funcMap = new LinkedHashMap<>();
         classMap = new LinkedHashMap<>();
         regIDAllocator = new RegIDAllocator();
+        varIndex = new LinkedHashMap<>(); index = 0;
     }
 
     @Override public ScopeType outerScope() { return null; }
@@ -25,6 +28,7 @@ public class GlobalScope implements ScopeType {
     @Override public void addVar(VarSymbol cur) {
         assertNotExistID(cur.getID());
         varMap.put(cur.getID(), cur);
+        varIndex.put(cur.getID(), index++);
     }
 
     @Override public void addFunc(FuncSymbol cur) {
@@ -69,6 +73,12 @@ public class GlobalScope implements ScopeType {
     }
 
     @Override
+    public int findVarIndexLocal(String ID) {
+        if (varMap.containsKey(ID)) return varIndex.get(ID);
+        throw new CompilationError("String: " + ID + " not found (in Global Scope)");
+    }
+
+    @Override
     public boolean existVarLocal(String ID) {
         return varMap.containsKey(ID);
     }
@@ -82,6 +92,9 @@ public class GlobalScope implements ScopeType {
     public boolean existClassLocal(String ID) {
         return classMap.containsKey(ID);
     }
+
+    @Override
+    public int getVarSize() { return varMap.size(); }
 
     @Override
     public RegIDAllocator getRegIDAllocator() { return regIDAllocator; }

@@ -270,6 +270,7 @@ public class SemanticChecker implements ASTVisitor {
         ClassSymbol classSymbol = node.getClassSymbol();
         curClass = classSymbol;
         curScope = classSymbol.getScope();
+        curBlockList.putClassVarNum(node.getClassID(), curScope.getVarSize());
 
         for (FuncDefNode curNode : node.getFuncDefList()) {
             curNode.accept(this);

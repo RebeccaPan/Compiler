@@ -18,6 +18,8 @@ public class LocalScope implements ScopeType {
     private Map<String, String> funcNameMap;
     private ArrayList<VarSymbol> varList;
     private RegIDAllocator regIDAllocator;
+    private Map<String, Integer> varIndex;
+    private int index;
 
     public LocalScope(ScopeType _outerScope) {
         outerScope = _outerScope;
@@ -25,6 +27,7 @@ public class LocalScope implements ScopeType {
         funcMap = new LinkedHashMap<>();
         varList = new ArrayList<>();
         regIDAllocator = _outerScope.getRegIDAllocator();
+        varIndex = new LinkedHashMap<>(); index = 0;
     }
 
     public ScopeType getOuterScope() { return outerScope; }
@@ -40,6 +43,7 @@ public class LocalScope implements ScopeType {
         assertNotExistID(cur.getID());
         varMap.put(cur.getID(), cur);
         varList.add(cur);
+        varIndex.put(cur.getID(), index++);
     }
 
     @Override
@@ -48,7 +52,7 @@ public class LocalScope implements ScopeType {
         funcMap.put(cur.getID(), cur);
     }
 
-    public void addConstructor (FuncSymbol cur) { funcMap.put(cur.getID(), cur); }
+    public void addConstructor(FuncSymbol cur) { funcMap.put(cur.getID(), cur); }
 
     @Override
     public void addClass(ClassSymbol cur) {
@@ -87,6 +91,12 @@ public class LocalScope implements ScopeType {
     }
 
     @Override
+    public int findVarIndexLocal(String ID) {
+        if (varMap.containsKey(ID)) return varIndex.get(ID);
+        throw new CompilationError("String: " + ID + " not found (in Local Scope)");
+    }
+
+    @Override
     public boolean existVarLocal(String ID) {
         return varMap.containsKey(ID);
     }
@@ -100,6 +110,9 @@ public class LocalScope implements ScopeType {
     public boolean existClassLocal(String ID) {
         return false;
     }
+
+    @Override
+    public int getVarSize() { return varMap.size(); }
 
     @Override
     public RegIDAllocator getRegIDAllocator() { return regIDAllocator; }

@@ -1,12 +1,15 @@
 package IR;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class IRBlockList {
     private ArrayList<Integer> globalList = new ArrayList<>();
     private ArrayList<IRBlock> blockList = new ArrayList<>();
     private ArrayList<String> stringList = new ArrayList<>();
     public boolean mainNeedRet = true;
+    private Map<String, Integer> classVarNumMap = new LinkedHashMap<>();
 
     public IRBlockList() {
         // left empty
@@ -71,4 +74,7 @@ public class IRBlockList {
         System.out.print(str);
         blockList.forEach(IRBlock::printASM);
     }
+
+    public void putClassVarNum(String ID, int num) { classVarNumMap.put(ID, num); }
+    public Integer getClassVarNum(String ID) { return classVarNumMap.get(ID); }
 }
