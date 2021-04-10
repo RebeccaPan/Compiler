@@ -18,7 +18,6 @@ public class Main {
 //        String filename = "./testcase/codegen/sorting/merge_sort.mx";
 //        String filename = "./testcase/codegen/shortest_path/dijkstra.mx";
 //        String filename = "./testcase/codegen/t60.mx";
-//        String filename = "./testcase/sema/class-package/class-2.mx";
         try {
             boolean semantic = false, codegen = false;
 //            InputStream inFile = new FileInputStream(filename);

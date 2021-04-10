@@ -700,6 +700,7 @@ public class SemanticChecker implements ASTVisitor {
             while (true) {
                 if (varScope.existVarLocal(node.getID())) {
                     node.setReg(varScope.findVarRegLocal(node.getID()));
+                    break;
                 }
                 if (varScope instanceof GlobalScope) break;
                 varScope = varScope.outerScope();
