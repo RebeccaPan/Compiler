@@ -16,7 +16,6 @@ public class LocalScope implements ScopeType {
     private ScopeType outerScope;
     private Map<String, VarSymbol> varMap;
     private Map<String, FuncSymbol> funcMap;
-    private Map<String, String> funcNameMap;
     private ArrayList<VarSymbol> varList;
     private RegIDAllocator regIDAllocator;
     private Map<String, Integer> varIndex;

@@ -188,8 +188,6 @@ public class SemanticChecker implements ASTVisitor {
                             new LocalScope(curScope),
                             new VoidType(),
                             curNode.getLocation(), true, ((ClassDefNode) cur).getClassID() );
-                    ((LocalScope) curScope).addConstructor(constructorSymbol);
-                    constructorSymbol.setType(null);
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curNode.setFuncSymbol(constructorSymbol);

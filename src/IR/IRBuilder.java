@@ -796,7 +796,6 @@ public class IRBuilder implements ASTVisitor {
         if (node.getExpr() != null) {
             node.getExpr().accept(this);
             IRLine line = new IRLine(IRLine.OPCODE.MOVE);
-//            line.addReg(node.getScope().findVarSymbol(node.getVarID()).getReg());
             line.addReg(node.getScope().findVarSymbol(node.getVarID()).getReg());
             line.addReg(node.getExpr().getReg());
             curBlock.addLine(line);
