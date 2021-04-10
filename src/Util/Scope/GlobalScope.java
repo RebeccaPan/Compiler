@@ -1,5 +1,6 @@
 package Util.Scope;
 
+import IR.IRReg;
 import Util.CompilationError;
 import Util.RegIDAllocator;
 import Util.Symbol.*;
@@ -13,6 +14,7 @@ public class GlobalScope implements ScopeType {
     private Map<String, ClassSymbol> classMap;
     public RegIDAllocator regIDAllocator;
     private Map<String, Integer> varIndex;
+    private Map<String, IRReg> varReg;
     private int index;
 
     public GlobalScope() {
@@ -21,6 +23,7 @@ public class GlobalScope implements ScopeType {
         classMap = new LinkedHashMap<>();
         regIDAllocator = new RegIDAllocator();
         varIndex = new LinkedHashMap<>(); index = 0;
+        varReg = new LinkedHashMap<>();
     }
 
     @Override public ScopeType outerScope() { return null; }
@@ -29,6 +32,7 @@ public class GlobalScope implements ScopeType {
         assertNotExistID(cur.getID());
         varMap.put(cur.getID(), cur);
         varIndex.put(cur.getID(), index++);
+        varReg.put(cur.getID(), cur.getReg());
     }
 
     @Override public void addFunc(FuncSymbol cur) {
@@ -75,6 +79,12 @@ public class GlobalScope implements ScopeType {
     @Override
     public int findVarIndexLocal(String ID) {
         if (varMap.containsKey(ID)) return varIndex.get(ID);
+        throw new CompilationError("String: " + ID + " not found (in Global Scope)");
+    }
+
+    @Override
+    public IRReg findVarRegLocal(String ID) {
+        if (varMap.containsKey(ID)) return varReg.get(ID);
         throw new CompilationError("String: " + ID + " not found (in Global Scope)");
     }
 

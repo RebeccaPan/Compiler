@@ -155,6 +155,7 @@ public class SemanticChecker implements ASTVisitor {
         for (var cur : node.getDefNodeList()) {
             if (cur instanceof ClassDefNode) {
                 ClassDefNode classDefNode = (ClassDefNode) cur;
+                curClass = curScope.findClassSymbol(((ClassDefNode) cur).getClassID());
                 curScope = classDefNode.getScope();
                 classDefNode.getVarDefList().forEach(x -> x.accept(this));
                 for (FuncDefNode curNode : classDefNode.getFuncDefList()) {
@@ -187,6 +188,8 @@ public class SemanticChecker implements ASTVisitor {
                             new LocalScope(curScope),
                             new VoidType(),
                             curNode.getLocation(), true, ((ClassDefNode) cur).getClassID() );
+                    ((LocalScope) curScope).addConstructor(constructorSymbol);
+                    constructorSymbol.setType(null);
                     // set scope & funcSymbol of curNode
                     curNode.setScope(constructorSymbol.getScope());
                     curNode.setFuncSymbol(constructorSymbol);
@@ -660,8 +663,8 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(AssignExprNode node) {
         node.setScope(curScope);
         ExprNode lhs = node.getLhs(), rhs = node.getRhs();
-        lhs.accept(this); lhs.assertIsVal(node.getLocation());
         rhs.accept(this); rhs.assertIsVal(node.getLocation());
+        lhs.accept(this); lhs.assertIsVal(node.getLocation());
         if (!(lhs.getExprCat() == ExprNode.ExprCat.LVal))
             throw new CompilationError("Semantic - assign to non-LVal", node.getLocation());
         lhs.getType().assignable(rhs.getType(), node.getLocation());
@@ -695,7 +698,14 @@ public class SemanticChecker implements ASTVisitor {
         else if (symbol instanceof VarSymbol) {
             node.setType(symbol.getType());
             node.setExprCat(ExprNode.ExprCat.LVal);
-            node.setReg(node.getSymbol().getReg());
+            ScopeType varScope = curScope;
+            while (true) {
+                if (varScope.existVarLocal(node.getID())) {
+                    node.setReg(varScope.findVarRegLocal(node.getID()));
+                }
+                if (varScope instanceof GlobalScope) break;
+                varScope = varScope.outerScope();
+            }
         }
         else throw new CompilationError("Semantic - IDNode not as class, func or var", node.getLocation());
     }

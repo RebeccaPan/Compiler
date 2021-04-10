@@ -771,7 +771,7 @@ public class IRBuilder implements ASTVisitor {
                         line.addReg(temp1);
                         curBlock.addLine(line);
 
-                        node.setReg(new IRReg(node.getReg().getID(), node.getReg().getType(), true));
+                        node.setReg(new IRReg(temp2.getID(), temp2.getType(), true));
                     }
                 }
                 break;
@@ -796,6 +796,7 @@ public class IRBuilder implements ASTVisitor {
         if (node.getExpr() != null) {
             node.getExpr().accept(this);
             IRLine line = new IRLine(IRLine.OPCODE.MOVE);
+//            line.addReg(node.getScope().findVarSymbol(node.getVarID()).getReg());
             line.addReg(node.getScope().findVarSymbol(node.getVarID()).getReg());
             line.addReg(node.getExpr().getReg());
             curBlock.addLine(line);

@@ -1,5 +1,6 @@
 package Util.Scope;
 
+import IR.IRReg;
 import Util.RegIDAllocator;
 import Util.Symbol.*;
 
@@ -14,6 +15,7 @@ public interface ScopeType {
     ClassSymbol findClassSymbol(String ID);
     VarSymbol findVarSymbol(String ID);
     int findVarIndexLocal(String ID);
+    IRReg findVarRegLocal(String ID);
     boolean existVarLocal(String ID);
     boolean existFuncLocal(String ID);
     boolean existClassLocal(String ID);

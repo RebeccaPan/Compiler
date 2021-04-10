@@ -1,5 +1,6 @@
 package Util.Scope;
 
+import IR.IRReg;
 import Util.CompilationError;
 import Util.RegIDAllocator;
 import Util.Symbol.ClassSymbol;
@@ -19,6 +20,7 @@ public class LocalScope implements ScopeType {
     private ArrayList<VarSymbol> varList;
     private RegIDAllocator regIDAllocator;
     private Map<String, Integer> varIndex;
+    private Map<String, IRReg> varReg;
     private int index;
 
     public LocalScope(ScopeType _outerScope) {
@@ -28,6 +30,7 @@ public class LocalScope implements ScopeType {
         varList = new ArrayList<>();
         regIDAllocator = _outerScope.getRegIDAllocator();
         varIndex = new LinkedHashMap<>(); index = 0;
+        varReg = new LinkedHashMap<>();
     }
 
     public ScopeType getOuterScope() { return outerScope; }
@@ -44,6 +47,7 @@ public class LocalScope implements ScopeType {
         varMap.put(cur.getID(), cur);
         varList.add(cur);
         varIndex.put(cur.getID(), index++);
+        varReg.put(cur.getID(), cur.getReg());
     }
 
     @Override
@@ -93,6 +97,12 @@ public class LocalScope implements ScopeType {
     @Override
     public int findVarIndexLocal(String ID) {
         if (varMap.containsKey(ID)) return varIndex.get(ID);
+        throw new CompilationError("String: " + ID + " not found (in Local Scope)");
+    }
+
+    @Override
+    public IRReg findVarRegLocal(String ID) {
+        if (varMap.containsKey(ID)) return varReg.get(ID);
         throw new CompilationError("String: " + ID + " not found (in Local Scope)");
     }
 
