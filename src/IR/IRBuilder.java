@@ -764,7 +764,7 @@ public class IRBuilder implements ASTVisitor {
                         IRReg temp1 = curBlock.regIDAllocator.allocate(5);
                         IRLine line = new IRLine(IRLine.OPCODE.LOAD);
                         line.addReg(temp1);
-                        line.addReg(new IRReg(node.getReg().getID(), 8, false));
+                        line.addReg(new IRReg(curScope.findVarIndexLocal(node.getID()), 8, false));
                         curBlock.addLine(line);
 
                         IRReg temp2 = curBlock.regIDAllocator.allocate(5);
