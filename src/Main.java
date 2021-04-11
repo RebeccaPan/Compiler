@@ -17,7 +17,7 @@ public class Main {
 //        change relative address here:
 //        String filename = "./testcase/codegen/sorting/merge_sort.mx";
 //        String filename = "./testcase/codegen/shortest_path/dijkstra.mx";
-//        String filename = "./testcase/codegen/t60.mx";
+//        String filename = "./testcase/codegen/t18.mx";
         try {
             boolean semantic = false, codegen = false;
 //            InputStream inFile = new FileInputStream(filename);

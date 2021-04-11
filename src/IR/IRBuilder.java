@@ -319,7 +319,9 @@ public class IRBuilder implements ASTVisitor {
                 line.addReg(new IRReg(10, 0, false));
                 curBlock.addLine(line);
 
-                tempScope = tempScope.findSymbol(node.getType().getType()).getScope();
+                Type tempType = node.getType();
+                if (tempType instanceof ArrayType) tempType = ((ArrayType) tempType).getBaseType();
+                tempScope = tempScope.findSymbol(tempType.getType()).getScope();
                 if (tempScope.existFuncLocal(node.getType().getType())) {
                     line = new IRLine(IRLine.OPCODE.CALL);
                     line.setFuncStr("my_c_" + node.getType().getType() + "_" + node.getType().getType());
