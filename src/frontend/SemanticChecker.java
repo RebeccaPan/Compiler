@@ -337,7 +337,7 @@ public class SemanticChecker implements ASTVisitor {
         }
         int allocateType;
         if (curScope.outerScope() == null) allocateType = 2; // Global
-        else allocateType = (curClass == null) ? 1 : 11; // Local or inClass
+        else allocateType = (curClass == null || curFunc != null) ? 1 : 11; // Local or inClass
         VarSymbol varSymbol = new VarSymbol(node.getVarID(), curScope, type, node.getLocation(), allocateType);
         curScope.addVar(varSymbol);
         node.setScope(curScope);

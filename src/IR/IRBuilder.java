@@ -319,6 +319,7 @@ public class IRBuilder implements ASTVisitor {
                 line.addReg(new IRReg(10, 0, false));
                 curBlock.addLine(line);
 
+                tempScope = tempScope.findSymbol(node.getType().getType()).getScope();
                 if (tempScope.existFuncLocal(node.getType().getType())) {
                     line = new IRLine(IRLine.OPCODE.CALL);
                     line.setFuncStr("my_c_" + node.getType().getType() + "_" + node.getType().getType());
@@ -796,7 +797,7 @@ public class IRBuilder implements ASTVisitor {
         if (node.getExpr() != null) {
             node.getExpr().accept(this);
             IRLine line = new IRLine(IRLine.OPCODE.MOVE);
-            line.addReg(node.getScope().findVarSymbol(node.getVarID()).getReg());
+            line.addReg(node.getScope().findVarRegLocal(node.getVarID()));
             line.addReg(node.getExpr().getReg());
             curBlock.addLine(line);
         }
