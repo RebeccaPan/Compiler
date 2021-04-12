@@ -75,6 +75,7 @@ public class IRBlockList {
         blockList.forEach(IRBlock::printASM);
     }
 
+    public ArrayList<IRBlock> getBlockList() { return blockList; }
     public void putClassVarNum(String ID, int num) { classVarNumMap.put(ID, num); }
     public Integer getClassVarNum(String ID) { return classVarNumMap.get(ID); }
 }

@@ -15,9 +15,7 @@ import java.io.PrintStream;
 public class Main {
     public static void main(String[] args) throws Exception {
 //        change relative address here:
-//        String filename = "./testcase/codegen/sorting/merge_sort.mx";
-//        String filename = "./testcase/codegen/shortest_path/dijkstra.mx";
-//        String filename = "./testcase/codegen/t18.mx";
+//        String filename = "./testcase-2021/optim-new/efficiency.mx";
         try {
             boolean semantic = false, codegen = false;
 //            InputStream inFile = new FileInputStream(filename);

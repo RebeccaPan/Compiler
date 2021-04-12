@@ -294,7 +294,8 @@ public class SemanticChecker implements ASTVisitor {
             node.getSuite().accept(this);
         curScope = funcSymbol.getScope();
         if (node.getFuncID().equals("main") && !(curScope.outerScope() instanceof GlobalScope))
-            throw new CompilationError("Semantic - main func not in global scope", node.getLocation());
+            if (curClass == null) // allow function named "main" in class
+                throw new CompilationError("Semantic - main func not in global scope", node.getLocation());
     }
 
     @Override

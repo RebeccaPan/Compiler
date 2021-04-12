@@ -374,4 +374,6 @@ public class IRBlock {
     public void addLine(IRLine line) { lineList.add(line); }
     public int getRetLabel() { return retLabel; }
     public void setRetLabel(int retLabel) { this.retLabel = retLabel; }
+    public ArrayList<IRLine> getLineList() { return lineList; }
+    public void setLineList(ArrayList<IRLine> lineList) { this.lineList = lineList; }
 }
