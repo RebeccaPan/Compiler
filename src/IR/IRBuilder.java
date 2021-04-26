@@ -349,11 +349,19 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ExprStmtNode node) {
+        if (node.getExprNode().hasConstVal()) return;
         node.getExprNode().accept(this);
     }
 
     @Override
     public void visit(IfStmtNode node) {
+        if (node.getCond().hasConstVal()) {
+            boolean cond = ((BoolLiteralNode) node.getCond().getConstVal()).getVal();
+            if (cond) node.getTrueSuite().accept(this);
+            else if (node.getFalseSuite() != null) node.getFalseSuite().accept(this);
+            return;
+        }
+
         int _condFalse = condFalse, _condEnd = condEnd;
         condEnd = ++labelNum;
         if (node.getFalseSuite().getStmtNodeList().size() > 0) condFalse = ++labelNum;
@@ -389,6 +397,13 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ForStmtNode node) {
+        if (node.getCond().hasConstVal()) {
+            if (!((BoolLiteralNode) node.getCond().getConstVal()).getVal()) {
+                if (node.getInit() != null) node.getInit().accept(this);
+                return;
+            }
+        }
+
         int _loopStart, _loopEnd, _loopNext;
         _loopStart = loopStart; _loopEnd = loopEnd; _loopNext = loopNext;
         loopStart = ++labelNum;
@@ -435,6 +450,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(WhileStmtNode node) {
+        if (node.getExpr().hasConstVal()) {
+            if (!((BoolLiteralNode) node.getExpr().getConstVal()).getVal()) {
+                return;
+            }
+        }
+
         int _loopStart, _loopEnd, _loopNext;
         _loopStart = loopStart; _loopEnd = loopEnd; _loopNext = loopNext;
         loopNext = loopStart = ++labelNum;
@@ -490,6 +511,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(PrefixExprNode node) {
+        if (node.hasConstVal()) {
+            node.getConstVal().accept(this);
+            node.setReg(node.getConstVal().getReg());
+            return;
+        }
+
         node.getExpr().accept(this);
         String op = node.getOp();
         switch (op) {
@@ -627,6 +654,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(BinaryExprNode node) {
+        if (node.hasConstVal()) {
+            node.getConstVal().accept(this);
+            node.setReg(node.getConstVal().getReg());
+            return;
+        }
+
         node.setReg(curBlock.regIDAllocator.allocate(5));
         String op = node.getOp();
 
@@ -749,6 +782,38 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(IDNode node) {
+        if (node.hasConstVal()) {
+            ExprNode constVal = node.getConstVal();
+            if (constVal instanceof BoolLiteralNode) {
+                // the same as visit(BoolLiteralNode)
+                node.setReg(curBlock.regIDAllocator.allocate(5));
+                IRLine line = new IRLine(IRLine.OPCODE.LOAD);
+                line.addReg(node.getReg());
+                line.addReg(((BoolLiteralNode) constVal).getVal() ? CONST_ONE : CONST_ZERO);
+                curBlock.addLine(line);
+            } else if (constVal instanceof IntLiteralNode) {
+                // the same as visit(IntLiteralNode)
+                node.setReg(curBlock.regIDAllocator.allocate(5));
+                IRLine line = new IRLine(IRLine.OPCODE.LOAD);
+                line.addReg(node.getReg());
+                line.addReg(new IRReg(((IntLiteralNode) constVal).getVal(), 8, false));
+                curBlock.addLine(line);
+            } else if (constVal instanceof StrLiteralNode) {
+                // the same as visit(StrLiteralNode)
+                node.setReg(curBlock.regIDAllocator.allocate(5));
+                IRLine line = new IRLine(IRLine.OPCODE.LOADSTRING);
+                line.addReg(node.getReg());
+                line.addReg(new IRReg(curBlockList.addStr(((StrLiteralNode) constVal).getVal()), 9, false));
+                curBlock.addLine(line);
+            } else { // the same as visit(NullLiteralNode)
+                node.setReg(curBlock.regIDAllocator.allocate(5));
+                IRLine line = new IRLine(IRLine.OPCODE.LOAD);
+                line.addReg(node.getReg());
+                line.addReg(CONST_ZERO);
+                curBlock.addLine(line);
+            }
+        }
+
         ScopeType curScope = node.getScope();
         while (true) {
             if (curScope.existVarLocal(node.getID())) {

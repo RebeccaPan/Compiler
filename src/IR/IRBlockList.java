@@ -38,12 +38,7 @@ public class IRBlockList {
 
     public void initASM() {
         blockList.forEach(IRBlock::fulfill);
-//        print();
         blockList.forEach(IRBlock::allocate);
-//        System.out.println("----------------------");
-//        System.out.println("After all these ordeal");
-//        print();
-//        System.out.println("----------------------");
         blockList.forEach(IRBlock::fulfillLocal);
         blockList.forEach(IRBlock::allocateLocal);
         blockList.forEach(IRBlock::trim);
@@ -75,6 +70,8 @@ public class IRBlockList {
         blockList.forEach(IRBlock::printASM);
     }
 
+    public ArrayList<Integer> getGlobalList() { return globalList; }
+    public ArrayList<String> getStringList() { return stringList; }
     public ArrayList<IRBlock> getBlockList() { return blockList; }
     public void putClassVarNum(String ID, int num) { classVarNumMap.put(ID, num); }
     public Integer getClassVarNum(String ID) { return classVarNumMap.get(ID); }
