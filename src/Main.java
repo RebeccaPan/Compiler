@@ -27,12 +27,17 @@ public class Main {
                 if (arg.equals("-semantic")) semantic = true;
                 if (arg.equals("-codegen")) codegen = true;
             }
-            ProgramNode ast = BuildAST(inFile);
-            IRBlockList blockList = new IRBlockList();
-            GlobalScope globalScope = new GlobalScope();
-            new SemanticChecker(blockList).visit(ast);
+            // semantic
+            if (semantic) {
+                ProgramNode ast = BuildAST(inFile);
+                IRBlockList blockList = new IRBlockList();
+                new SemanticChecker(blockList).visit(ast);
+            } else if (codegen) {
+                ProgramNode ast = BuildAST(inFile);
+                IRBlockList blockList = new IRBlockList();
+                GlobalScope globalScope = new GlobalScope();
+                new SemanticChecker(blockList).visit(ast);
 
-            if (codegen) {
                 new IRBuilder(globalScope, blockList).visit(ast);
                 blockList.initASM();
                 blockList.printASM();
