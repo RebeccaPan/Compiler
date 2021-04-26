@@ -17,14 +17,14 @@ public class Main {
     public static void main(String[] args) throws Exception {
 //        change relative address here:
 //        String filename = "./testcase-2021/optim-new/efficiency.mx";
-        String filename = "./testcase/codegen/Malachite.mx";
+//        String filename = "./testcase/codegen/Malachite.mx";
         try {
             boolean semantic = false, codegen = false;
-            InputStream inFile = new FileInputStream(filename);
-//            InputStream inFile = System.in;
-//            File outFile = new File("output.s");
-//            PrintStream stream = new PrintStream(outFile);
-//            System.setOut(stream);
+//            InputStream inFile = new FileInputStream(filename);
+            InputStream inFile = System.in;
+            File outFile = new File("output.s");
+            PrintStream stream = new PrintStream(outFile);
+            System.setOut(stream);
             for (String arg : args) {
                 if (arg.equals("-semantic")) semantic = true;
                 if (arg.equals("-codegen")) codegen = true;
