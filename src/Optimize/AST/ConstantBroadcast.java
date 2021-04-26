@@ -185,7 +185,7 @@ public class ConstantBroadcast extends Opt implements ASTVisitor {
                 String valLhs = ((StrLiteralNode) node.getLhs().getConstVal()).getVal();
                 String valRhs = ((StrLiteralNode) node.getRhs().getConstVal()).getVal();
                 switch (op) {
-                    case "+" -> node.setConstVal(new  StrLiteralNode(loc, valLhs + valRhs));
+                    case "+" -> node.setConstVal(new  StrLiteralNode(loc, "_" + valLhs + valRhs + "_"));
                     case "<" -> node.setConstVal(new BoolLiteralNode(loc, valLhs.compareTo(valRhs) < 0));
                     case ">" -> node.setConstVal(new BoolLiteralNode(loc, valLhs.compareTo(valRhs) > 0));
                     case "<="-> node.setConstVal(new BoolLiteralNode(loc, valLhs.compareTo(valRhs) <=0));
@@ -284,7 +284,7 @@ public class ConstantBroadcast extends Opt implements ASTVisitor {
                     else if (type instanceof IntType)
                         constValMap.put(node.getVarSymbol(), new IntLiteralNode(node.getLocation(), 0));
                     else if (type instanceof StringType)
-                        constValMap.put(node.getVarSymbol(), new StrLiteralNode(node.getLocation(), ""));
+                        constValMap.put(node.getVarSymbol(), new StrLiteralNode(node.getLocation(), "__"));
                     else if (type instanceof NullLiteralNode)
                         constValMap.put(node.getVarSymbol(), new NullLiteralNode(node.getLocation()));
                 }

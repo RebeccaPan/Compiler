@@ -812,6 +812,7 @@ public class IRBuilder implements ASTVisitor {
                 line.addReg(CONST_ZERO);
                 curBlock.addLine(line);
             }
+            return;
         }
 
         ScopeType curScope = node.getScope();
