@@ -68,7 +68,7 @@ public class ConvertImm extends Opt {
                             } else newLineList.add(curLine);
                         } else newLineList.add(curLine);
                     }
-                    case MOVE -> {
+                    /*case MOVE -> {
                         if (prvLine.getOpcode() == IRLine.OPCODE.LOAD
                                 && prvLine.getRegList().get(0).getType() == 5
                                 && prvLine.getRegList().get(1).getType() == 8) {
@@ -84,7 +84,7 @@ public class ConvertImm extends Opt {
                                 updated = true;
                             } else newLineList.add(curLine);
                         } else newLineList.add(curLine);
-                    }
+                    }*/
                     default -> newLineList.add(curLine);
                 }
             }
