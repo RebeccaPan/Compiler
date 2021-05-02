@@ -4,6 +4,7 @@ public class IRReg {
     private int ID, type; // the ID-th of typeID
     private boolean isPtr;
     private int usedID = -1;
+    private boolean multi = false;
 
     public IRReg(int _ID, int _type, boolean _isPtr) {
         ID = _ID; type = _type; isPtr = _isPtr;
@@ -76,6 +77,11 @@ public class IRReg {
         return ".LS" + ID;
     }
 
+    public void assign(IRReg rhs) {
+        ID = rhs.getID(); type = rhs.getType();
+        isPtr = rhs.isPtr(); multi = rhs.hasMulti();
+    }
+
     public int getID() { return ID; }
     public void setID(int ID) { this.ID = ID; }
     public int getType() { return type; }
@@ -84,4 +90,6 @@ public class IRReg {
     public void setPtr(boolean ptr) { isPtr = ptr; }
     public int getUsedID() { return usedID; }
     public void setUsedID(int usedID) { this.usedID = usedID; }
+    public boolean hasMulti() { return multi; }
+    public void setMulti(boolean multi) { this.multi = multi; }
 }

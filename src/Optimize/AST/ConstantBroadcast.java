@@ -28,7 +28,11 @@ public class ConstantBroadcast extends Opt implements ASTVisitor {
     public ConstantBroadcast(IRBlockList _curBlockList) { super(_curBlockList); programNode = null; }
 
     @Override
-    public void opt() { updated = false; visit(programNode); }
+    public void opt() {
+        updated = false;
+        visit(programNode);
+        System.out.print("");
+    }
 
     @Override public void visit(BoolLiteralNode node) { node.setConstVal(node); }
     @Override public void visit(IntLiteralNode node) { node.setConstVal(node); }

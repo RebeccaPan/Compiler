@@ -3,17 +3,35 @@ package IR;
 import java.util.ArrayList;
 
 public class IRLine {
-    public enum OPCODE {
+    public enum OPCODE { // TODO: BLE BLE BLT BGE BGT, ANDI SLTI, EQI, MULI
         FUNC, LABEL, MOVE, JUMP, CALL, BNEQ, BEQ, NEG, NOT, LOGICNOT,
         EQ, NEQ, GE, GEQ, LE, LEQ, ADD, SUB, MUL, DIV, MOD,
         OR, AND, XOR, SHL, SHR, INDEX, LOAD, LOADSTRING, RETURN,
-        ADDI, LW, SW }
+        ADDI, ANDI, SLTI, /*EQI, MULI, */LW, SW }
     private OPCODE opcode;
     private ArrayList<IRReg> regList = new ArrayList<>();
     private int label = 0;
     private String funcStr = null;
 
     public IRLine(OPCODE _opcode) { opcode = _opcode; }
+
+    public boolean isDefLine() {
+        return ! ( opcode == OPCODE.FUNC
+                || opcode == OPCODE.LABEL
+                || opcode == OPCODE.JUMP
+                || opcode == OPCODE.CALL
+                || opcode == OPCODE.BEQ
+                || opcode == OPCODE.BNEQ
+                || opcode == OPCODE.SW ) ;
+    }
+
+    public int regLoc() {
+        return switch (opcode) {
+            case FUNC, LABEL, JUMP, CALL -> -1;
+            case SW, BEQ, BNEQ -> 0;
+            default -> 1;
+        };
+    }
 
     public void print() {
         switch (opcode) {
@@ -48,6 +66,10 @@ public class IRLine {
             case LOADSTRING -> System.out.print("\tLOADSTRING");
             case RETURN   -> System.out.print("\tRETURN");
             case ADDI     -> System.out.print("\tADDI");
+            case ANDI     -> System.out.print("\tANDI");
+            case SLTI     -> System.out.print("\tSLTI");
+//            case EQI      -> System.out.print("\tEQI");
+//            case MULI     -> System.out.print("\tMULI");
             case LW       -> System.out.print("\tLW");
             case SW       -> System.out.print("\tSW");
         }
@@ -69,7 +91,7 @@ public class IRLine {
         String reg0 = regList.size() > 0 ? regList.get(0).toASM() : null;
         String reg1 = regList.size() > 1 ? regList.get(1).toASM() : null;
         String reg2 = regList.size() > 2 ? regList.get(2).toASM() : null;
-        String labelStr = ".LAB" + label;
+        String labelStr = ".b" + block.getIndex() + "l" + label;
         switch (opcode) {
             case FUNC -> { }
             case LABEL -> str = labelStr + ":";
@@ -81,10 +103,10 @@ public class IRLine {
             case NEG   -> str = "\tneg\t" + reg0 + "," + reg1;
             case NOT   -> str = "\tnot\t" + reg0 + "," + reg1;
             case LOGICNOT -> str = "\tseqz\t" + reg0 + "," + reg1;
-            case EQ  -> str = "\tsub\t" + reg1 + "," + reg1 + "," + reg2 + "\n"
-                            + "\tseqz\t" + reg0 + "," + reg1;
-            case NEQ -> str = "\tsub\t" + reg1 + "," + reg1 + "," + reg2 + "\n"
-                            + "\tsnez\t" + reg0 + "," + reg1;
+            case EQ  -> str = "\tsub\t" + "t5" + "," + reg1 + "," + reg2 + "\n"
+                            + "\tseqz\t" + reg0 + "," + "t5";
+            case NEQ -> str = "\tsub\t" + "t5" + "," + reg1 + "," + reg2 + "\n"
+                            + "\tsnez\t" + reg0 + "," + "t5";
             case GE  -> str = "\tsgt\t" + reg0 + "," + reg1 + "," + reg2;
             case LE  -> str = "\tslt\t" + reg0 + "," + reg1 + "," + reg2;
             case GEQ -> str = "\tslt\t" + reg0 + "," + reg1 + "," + reg2 + "\n"
@@ -101,8 +123,8 @@ public class IRLine {
             case XOR -> str = "\txor\t" + reg0 + "," + reg1 + "," + reg2;
             case SHL -> str = "\tsll\t" + reg0 + "," + reg1 + "," + reg2;
             case SHR -> str = "\tsra\t" + reg0 + "," + reg1 + "," + reg2;
-            case INDEX -> str = "\tslli\t" + reg2 + "," + reg2 + ",2\n"
-                              + "\tadd\t" + reg0 + "," + reg1 + "," + reg2;
+            case INDEX -> str = "\tslli\t" + "t6" + "," + reg2 + ",2\n"
+                              + "\tadd\t" + reg0 + "," + reg1 + "," + "t6";
             case LOAD, LOADSTRING -> {
                 str = switch (regList.get(1).getType()) {
                     case 2 -> "\tlui\t" + reg0 + ",%hi(" + regList.get(1).toGASM() + ")";
@@ -114,13 +136,17 @@ public class IRLine {
             }
             case RETURN -> str = "\tRETURN";
             case ADDI -> str = "\taddi\t" + reg0 + "," + reg1 + "," + regList.get(2).getID();
+            case ANDI -> str = "\tandi\t" + reg0 + "," + reg1 + "," + regList.get(2).getID();
+            case SLTI -> str = "\tslti\t" + reg0 + "," + reg1 + "," + regList.get(2).getID();
+//            case EQI  -> str = "\taddi\t" + reg0 + "," + reg1 + "," + regList.get(2).getID();
+//            case MULI -> str = "\taddi\t" + reg0 + "," + reg1 + "," + regList.get(2).getID();
             case LW -> {
                 str = "\tlw\t" + reg0 + ","
                     + switch (regList.get(1).getType()) {
                     case 0 -> "0(" + reg1 + ")";
-                    case 1 -> block.LAddr(regList.get(1).getID()) + "(s0)";
                     case 2 -> "%lo(" + regList.get(1).toGASM() + ")(" + reg2 + ")";
-                    case 4 -> block.PAddr(regList.get(1).getID()) + "(s0)";
+                    case 4 -> block.PAddr(regList.get(1).getID()) + block.getMemRAM() + "(sp)";
+                    case 12-> block.LAddr(regList.get(1).getID()) + block.getMemRAM() + "(sp)";
                     default -> "";
                 };
             }
@@ -128,10 +154,10 @@ public class IRLine {
                 str = "\tsw\t" + reg0 + ","
                     + switch (regList.get(1).getType()) {
                     case 0 -> "0(" + reg1 + ")";
-                    case 1 -> block.LAddr(regList.get(1).getID()) + "(s0)";
                     case 2 -> "%lo(" + regList.get(1).toGASM() + ")(" + reg2 + ")";
-                    case 4 -> block.PAddr(regList.get(1).getID()) + "(s0)";
+                    case 4 -> block.PAddr(regList.get(1).getID()) + block.getMemRAM() + "(sp)";
                     case 7 -> block.PAddr(regList.get(1).getID()) + "(sp)";
+                    case 12-> block.LAddr(regList.get(1).getID()) + block.getMemRAM() + "(sp)";
                     default -> "";
                 };
             }

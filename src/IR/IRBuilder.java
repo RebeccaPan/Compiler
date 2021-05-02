@@ -74,6 +74,7 @@ public class IRBuilder implements ASTVisitor {
             if (defNode instanceof VarDefNode) globalVarDefList.add(defNode); // accept later in main func
             else defNode.accept(this);
         }
+        curBlockList.setMaxLabel(labelNum + 1);
     }
 
     @Override
@@ -99,7 +100,10 @@ public class IRBuilder implements ASTVisitor {
         // manually check size()
         if (node.getFuncSymbol().isInClass() && node.getFuncSymbol().getClassID() == null) fullFuncName = "my_array_size";
         curBlock = new IRBlock(fullFuncName, node.getScope().getRegIDAllocator(), ++labelNum);
+        curBlock.setArgNum((node.getParaList() != null ? node.getParaList().getParaList().size() : 0)
+                        + ((curClass != null ? 1 : 0)));
         curBlockList.addBlock(curBlock);
+        curBlock.setIndex(curBlockList.getBlockList().size() - 1);
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
         line.setFuncStr(fullFuncName);
         curBlock.addLine(line);
@@ -147,6 +151,9 @@ public class IRBuilder implements ASTVisitor {
                 curBlock.addLine(line);
             }
         }
+        line = new IRLine(IRLine.OPCODE.LABEL);
+        line.setLabel(curBlock.getRetLabel());
+        curBlock.addLine(line);
     }
 
     @Override
@@ -159,7 +166,10 @@ public class IRBuilder implements ASTVisitor {
         // manually check size()
         if (node.getFuncSymbol().isInClass() && node.getFuncSymbol().getClassID() == null) fullFuncName = "my_array_size";
         curBlock = new IRBlock(fullFuncName, node.getScope().getRegIDAllocator(), ++labelNum);
+        curBlock.setArgNum((node.getParaList() != null ? node.getParaList().getParaList().size() : 0)
+                + ((curClass != null ? 1 : 0)));
         curBlockList.addBlock(curBlock);
+        curBlock.setIndex(curBlockList.getBlockList().size() - 1);
         IRLine line = new IRLine(IRLine.OPCODE.FUNC);
         line.setFuncStr(fullFuncName);
         curBlock.addLine(line);
