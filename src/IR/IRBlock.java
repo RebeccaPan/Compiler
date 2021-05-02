@@ -382,24 +382,24 @@ public class IRBlock {
             for (int j = line.regLoc(); j != -1 && j < line.getRegList().size(); ++j) {
                 IRReg reg = line.getRegList().get(j);
                 if (reg.getType() == 5)
-                    graph.add(ID, reg.getID());
+                    graph.addEdge(ID, reg.getID());
                 else if (reg.getType() == 0 && reg.getID() >= 10)
-                    graph.add(ID, reg.getID() - 10 + regIDAllocator.size(5));
+                    graph.addEdge(ID, reg.getID() - 10 + regIDAllocator.size(5));
             }
             if (line.isDefLine() && vec[i] + 1 < lineList.size()
              && reach[vec[i] + 1] == cntL) {
                 IRReg reg = line.getRegList().get(0);
                 if (reg.getType() == 5)
-                    graph.add(ID, reg.getID());
+                    graph.addEdge(ID, reg.getID());
                 else if (reg.getType() == 0 && reg.getID() >= 10)
-                    graph.add(ID, reg.getID() - 10 + regIDAllocator.size(5));
+                    graph.addEdge(ID, reg.getID() - 10 + regIDAllocator.size(5));
             }
         }
     }
     private void allocPass(int i, int ID) {
         for (IRLine line : lineList) {
             for (IRReg reg : line.getRegList()) {
-                if (reg.getType() == 5) graph.add(ID, reg.getID());
+                if (reg.getType() == 5) graph.addEdge(ID, reg.getID());
             }
             if (line.getOpcode() == CALL) break;
         }
