@@ -264,43 +264,54 @@ public class IRBuilder implements ASTVisitor {
             line.addReg(new IRReg(10, 0, false));
             curBlock.addLine(line);
 
-            int iterStart = ++labelNum, iterEnd = ++labelNum;
-            line = new IRLine(IRLine.OPCODE.LABEL);
-            line.setLabel(iterStart);
-            curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.BNEQ);
-            line.addReg(iter);
-            line.addReg(CONST_NULL);
-            line.setLabel(iterEnd);
-            curBlock.addLine(line);
+            ScopeType tempScope = node.getScope();
+            while (tempScope instanceof LocalScope) tempScope = tempScope.outerScope();
+            if (i < node.getDimExprList().size() - 1
+             || (node.getType() instanceof ClassType
+                    || (node.getType() instanceof ArrayType
+                    && ((ArrayType) node.getType()).getBaseType() instanceof ClassType
+                    && tempScope.existClassLocal(
+                    ((ClassType) ((ArrayType) node.getType()).getBaseType()).getClassID() )
+                    && node.getType().getDim() == node.getDimExprList().size()))) {
+                int iterStart = ++labelNum, iterEnd = ++labelNum;
+                line = new IRLine(IRLine.OPCODE.LABEL);
+                line.setLabel(iterStart);
+                curBlock.addLine(line);
 
-            IRReg next_result = malloc(node, i + 1);
-            IRReg result = curBlock.regIDAllocator.allocate(5);
-            line = new IRLine(IRLine.OPCODE.INDEX);
-            line.addReg(result);
-            line.addReg(reg);
-            line.addReg(iter);
-            curBlock.addLine(line);
+                line = new IRLine(IRLine.OPCODE.BNEQ);
+                line.addReg(iter);
+                line.addReg(CONST_NULL);
+                line.setLabel(iterEnd);
+                curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.MOVE);
-            line.addReg(new IRReg(result.getID(), result.getType(), true));
-            line.addReg(next_result);
-            curBlock.addLine(line);
+                IRReg next_result = malloc(node, i + 1);
+                IRReg result = curBlock.regIDAllocator.allocate(5);
+                line = new IRLine(IRLine.OPCODE.INDEX);
+                line.addReg(result);
+                line.addReg(reg);
+                line.addReg(iter);
+                curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.ADDI);
-            line.addReg(iter);
-            line.addReg(iter);
-            line.addReg(CONST_MINUS_ONE);
-            curBlock.addLine(line);
+                line = new IRLine(IRLine.OPCODE.MOVE);
+                line.addReg(new IRReg(result.getID(), result.getType(), true));
+                line.addReg(next_result);
+                curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.JUMP);
-            line.setLabel(iterStart);
-            curBlock.addLine(line);
+                line = new IRLine(IRLine.OPCODE.ADDI);
+                line.addReg(iter);
+                line.addReg(iter);
+                line.addReg(CONST_MINUS_ONE);
+                curBlock.addLine(line);
 
-            line = new IRLine(IRLine.OPCODE.LABEL);
-            line.setLabel(iterEnd);
-            curBlock.addLine(line);
+                line = new IRLine(IRLine.OPCODE.JUMP);
+                line.setLabel(iterStart);
+                curBlock.addLine(line);
+
+                line = new IRLine(IRLine.OPCODE.LABEL);
+                line.setLabel(iterEnd);
+                curBlock.addLine(line);
+            }
             return reg;
         } else {
             ScopeType tempScope = node.getScope();
