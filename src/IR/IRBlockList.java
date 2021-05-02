@@ -37,7 +37,7 @@ public class IRBlockList {
         blockList.forEach(IRBlock::print);
     }
 
-    public void jumpUpdate() { blockList.forEach(x -> x.jumpUpdate(maxLabel)); }
+    public void jumpUpdate() { blockList.forEach(x -> x.jumpOpt(maxLabel)); }
     public void labelOpt() { blockList.forEach(x -> x.labelOpt(maxLabel)); }
     public void fulfill() { blockList.forEach(IRBlock::fulfill); }
 //    public void allocate() { blockList.forEach(IRBlock::allocate); }

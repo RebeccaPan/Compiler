@@ -5,40 +5,47 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public class Graph {
+	private int[] cs = {10, 11, 12, 13, 14, 15, 16, 17, 5, 6};
+	private int[] color = {10, 11, 12, 13, 14, 15, 16, 17, 5, 6, 7, 28, 29, 8, 9, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27};
 
-	public int n;
-	public ArrayList<ArrayList<Integer> > edges = new ArrayList<>();
+	private int n;
+	private int[] val;
+	private int[] deg, colorChoice;
+	private int colorChoiceNum;
+	private boolean[] spilled, colored;
+	private int maxColor = 0, normColor = 13;
+	private ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
+
+	public void addEdge(int x, int y) {
+		if (x != y) {
+			edges.get(x).add(y);
+			edges.get(y).add(x);
+		}
+	}
+
 	public boolean[] saved;
 
     public Graph(int _n) {
-		n = _n + c.length;
-		for (int i = 0; i < n; ++i) edges.add(new ArrayList<>());
+		n = _n + cs.length;
 		saved = new boolean[n];
+		for (int i = 0; i < n; ++i)
+			edges.add(new ArrayList<>());
     }
 
-	public void addEdge(int x, int y) {
-		if (x == y) return;
-		edges.get(x).add(y); edges.get(y).add(x);
-	}
 
-	public int[] deg, color_arr;
-	public int color_arr_num;
-	public boolean[] spilled, colored;
-	public int maxColor = 0, normColor = 13;
-	public int[] color = {10, 11, 12, 13, 14, 15, 16, 17, 5, 6, 7, 28, 29, 8, 9, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27};
-	public int[] c = {10, 11, 12, 13, 14, 15, 16, 17, 5, 6};
-	public int[] val;
-	public void work() {
+	private void init() {
 		for (int i = 0; i < n; ++i) {
 			HashSet<Integer> tempHashSet = new LinkedHashSet<>(edges.get(i));
 			edges.set(i, new ArrayList<>(tempHashSet));
 		}
-		val = new int[n];
+		deg = new int[n]; val = new int[n];
+		for (int i = 0; i < n; ++i) val[i] = -1;
 		spilled = new boolean[n];
 		colored = new boolean[n];
-		for (int i = 0; i < n; ++i) val[i] = -1;
+	}
 
-		deg = new int[n];
+	public void work() {
+		init();
 		ArrayList<Integer> spillArr = new ArrayList<>();
 		ArrayList<Integer> savedArr = new ArrayList<>();
 		for (int i = 0; i < n; ++i) {
@@ -51,52 +58,48 @@ public class Graph {
 				});
 			}
 		}
-		for (int i = n - c.length; i < n; ++i){
-			val[i] = i - (n - c.length);
-			colored[i] = true;
+		for (int i = n - cs.length; i < n; ++i){
+			val[i] = i - (n - cs.length); colored[i] = true;
 		}
 
-		color_arr = new int [n];
-		color_arr_num = 0;
+		colorChoice = new int [n];
+		colorChoiceNum = 0;
 
 		for (int i : savedArr) {
 			if (deg[i] < color.length - normColor) {
-				color_arr[color_arr_num++] = i;
-				colored[i] = true;
-			} else {
-				spillArr.add(i);
-			}
+				colorChoice[colorChoiceNum++] = i; colored[i] = true;
+			} else { spillArr.add(i); }
 		}
- 
+
  		for (int i = 0, head = 0; ; ++i){
-			while (i == color_arr_num && head < spillArr.size()){
+			while (i == colorChoiceNum && head < spillArr.size()){
 				int x = spillArr.get(head++);
 				if (!colored[x] && !spilled[x]){
 					spilled[x] = true;
 					edges.get(x).forEach(y -> {
 						if (!colored[y] && !spilled[y]){
 							if (--deg[y] < color.length - normColor && saved[y]){
-								color_arr[color_arr_num++] = y;
+								colorChoice[colorChoiceNum++] = y;
 								colored[y] = true;
 							}
 						}
 					});
 				}
 			}
-			if (i >= color_arr_num) break;
-			int v = color_arr[i];
+			if (i >= colorChoiceNum) break;
+			int v = colorChoice[i];
 			edges.get(v).forEach(x -> {
 				if (saved[x] && !colored[x] && !spilled[x]){
 					if (--deg[x] < color.length - normColor){
-						color_arr[color_arr_num++] = x;
+						colorChoice[colorChoiceNum++] = x;
 						colored[x] = true;
 					}
 				}
 			});
 		}
 
-		for (int i = color_arr_num - 1; i >= 0; --i) {
-			int v = color_arr[i];
+		for (int i = colorChoiceNum - 1; i >= 0; --i) {
+			int v = colorChoice[i];
 			boolean[] used = new boolean[color.length];
 			for (int j = 0; j < edges.get(v).size(); j++) {
 				int x = edges.get(v).get(j);
@@ -108,11 +111,11 @@ public class Graph {
 			if (now > maxColor) maxColor = now;
 		}
 
-		color_arr_num = 0;
+		colorChoiceNum = 0;
 		spillArr.clear();
 		for (int i = 0; i < n; ++i){
 			if (!colored[i] && !spilled[i] && deg[i] < color.length) {
-				color_arr[color_arr_num++] = i;
+				colorChoice[colorChoiceNum++] = i;
 				colored[i] = true;
 			}
 			spillArr.add(i);
@@ -127,33 +130,33 @@ public class Graph {
 		}
 		
  		for (int i = 0, head = 0; ; ++i){
-			while (i == color_arr_num && head < spillArr.size()){
+			while (i == colorChoiceNum && head < spillArr.size()){
 				int x = spillArr.get(head++);
 				if (!colored[x] && !spilled[x]){
 					spilled[x] = true;
 					edges.get(x).forEach(y -> {
 						if (!colored[y] && !spilled[y]){
 							if (--deg[y] < color.length){
-								color_arr[color_arr_num++] = y;
+								colorChoice[colorChoiceNum++] = y;
 								colored[y] = true;
 							}
 						}
 					});
 				}
 			}
-			if (i >= color_arr_num) break;
-			int v = color_arr[i];
+			if (i >= colorChoiceNum) break;
+			int v = colorChoice[i];
 			edges.get(v).forEach(x -> {
 				if (!colored[x] && !spilled[x]){
 					if (--deg[x] < color.length){
-						color_arr[color_arr_num++] = x;
+						colorChoice[colorChoiceNum++] = x;
 						colored[x] = true;
 					}
 				}
 			});
 		}
-		for (int i = color_arr_num - 1; i >= 0; --i){
-			int v = color_arr[i];
+		for (int i = colorChoiceNum - 1; i >= 0; --i){
+			int v = colorChoice[i];
 			boolean[] used = new boolean[color.length];
 			for (int j = 0; j < edges.get(v).size(); j++){
 				int x = edges.get(v).get(j);
@@ -166,13 +169,7 @@ public class Graph {
 		}
 	}
 
-	public int getColor(int x){
-		if (val[x] >= 0) return color[val[x]];
-		return -1;
-	}
-
-	public int useSaved(){
-		if (maxColor >= normColor) return maxColor - normColor + 1;
-		return 0;
-	}
+	public int getColor(int x){ return (val[x] >= 0) ? color[val[x]] : -1; }
+	public int useSaved(){ return (maxColor >= normColor) ? maxColor - normColor + 1 : 0; }
+	public int[] getCs() { return cs; }
 }

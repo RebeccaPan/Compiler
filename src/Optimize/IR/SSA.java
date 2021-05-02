@@ -43,10 +43,10 @@ public class SSA extends Opt {
                 }
             }
             if (line.getOpcode() == IRLine.OPCODE.JUMP) {
-                i = block.jumpTarget[i];
+                i = block.jumpTo[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    locAdjust(block.jumpTarget[i], ID, loc);
+                    locAdjust(block.jumpTo[i], ID, loc);
                 }
                 ++i;
             }
@@ -70,10 +70,10 @@ public class SSA extends Opt {
                 }
             }
             if (line.getOpcode() == IRLine.OPCODE.JUMP) {
-                i = block.jumpTarget[i];
+                i = block.jumpTo[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    assignAdjust(block.jumpTarget[i], ID, loc);
+                    assignAdjust(block.jumpTo[i], ID, loc);
                 }
                 ++i;
             }
@@ -134,7 +134,7 @@ public class SSA extends Opt {
     public void opt() {
         updated = false;
         for (IRBlock block : curBlockList.getBlockList()) {
-            block.jumpUpdate(curBlockList.getMaxLabel());
+            block.jumpOpt(curBlockList.getMaxLabel());
             block.labelOpt(curBlockList.getMaxLabel());
             operate(block);
             block.setCntL(cntL);

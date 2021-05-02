@@ -70,8 +70,7 @@ public class IRBlock {
         System.out.println(str);
     }
 
-    // TODO!!!
-    public void jumpUpdate(int maxLabel) {
+    public void jumpOpt(int maxLabel) {
         int[] used = new int [maxLabel + 1];
         ArrayList<IRLine> newLineList = new ArrayList<>();
         for (IRLine line : lineList) {
@@ -93,26 +92,25 @@ public class IRBlock {
         lineList = newLineList;
         newLineList = new ArrayList<>();
         for (IRLine line : lineList) {
-            if (line.getOpcode() == LABEL
-                    && used[line.getLabel()] == 0) continue;
+            if (line.getOpcode() == LABEL && used[line.getLabel()] == 0) continue;
             newLineList.add(line);
         }
         lineList = newLineList;
     }
 
-    public int[] jumpTarget, labelTarget;
+    public int[] jumpTo, labelTo;
     public void labelOpt(int maxLabel) {
-        jumpTarget = new int[lineList.size()];
-        labelTarget = new int[maxLabel + 1];
+        jumpTo = new int[lineList.size()];
+        labelTo = new int[maxLabel + 1];
         for (int i = 0; i < lineList.size(); ++i) {
             IRLine line = lineList.get(i);
-            if (line.getOpcode() == IRLine.OPCODE.LABEL) labelTarget[line.getLabel()] = i;
+            if (line.getOpcode() == IRLine.OPCODE.LABEL) labelTo[line.getLabel()] = i;
         }
         for (int i = 0; i < lineList.size(); ++i) {
             IRLine line = lineList.get(i);
             if (line.getOpcode() == IRLine.OPCODE.JUMP
                     || line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ)
-                jumpTarget[i] = labelTarget[line.getLabel()];
+                jumpTo[i] = labelTo[line.getLabel()];
         }
     }
 
@@ -131,16 +129,7 @@ public class IRBlock {
                         IRReg curReg = line.getRegList().get(j), temp;
                         IRLine curLine;
                         switch (curReg.getType()) {
-                            case 1, 4 -> {
-                                // TODO
-//                                temp = regIDAllocator.allocate(5);
-//                                curLine = new IRLine(IRLine.OPCODE.LW);
-//                                curLine.addReg(temp);
-//                                curLine.addReg(curReg);
-//                                newLineList.add(curLine);
-//                                line.getRegList().set(j, temp);
-                                line.setOpcode(LW);
-                            }
+                            case 1, 4 -> line.setOpcode(LW);
                             case 2 -> {
                                 temp = regIDAllocator.allocate(5);
                                 curLine = new IRLine(IRLine.OPCODE.LOAD);
@@ -359,15 +348,6 @@ public class IRBlock {
             for (int j = 0; j < reachTo.get(vec[i]).size(); ++j) {
                 int cur = reachTo.get(vec[i]).get(j);
                 IRLine line = lineList.get(cur);
-              /*  if (reach[cur] < cntL && !line.isDefLine()) {
-                    if (line.getRegList().size() > 0) {
-                        IRReg reg = line.getRegList().get(0);
-                        if (reg.getType() == 5 && reg.getID() == ID) {
-                            reach[i] = cntL;
-                            vec[top++] = i;
-                        }
-                    }
-                }*/
                 if(reach[cur] < cntL && !(line.isDefLine() && line.getRegList().size() > 0 && line.getRegList().get(0).getType() == 5 && line.getRegList().get(0).getID() == ID)){
                     reach[cur] = cntL;
                     vec[top++] = cur;
@@ -396,7 +376,7 @@ public class IRBlock {
             }
         }
     }
-    private void allocPass(int i, int ID) {
+    private void allocAdjust(int ID) {
         for (IRLine line : lineList) {
             for (IRReg reg : line.getRegList()) {
                 if (reg.getType() == 5) graph.addEdge(ID, reg.getID());
@@ -418,7 +398,7 @@ public class IRBlock {
         for (int i = 0; i < linesNum; i++){
             IRLine line = lineList.get(i);
             if (line.getOpcode() == JUMP || line.getOpcode() == BEQ || line.getOpcode() == BNEQ){
-                reachTo.get(jumpTarget[i]).add(i);
+                reachTo.get(jumpTo[i]).add(i);
             }
             if (line.getOpcode() != JUMP && i + 1 < lineList.size()) reachTo.get(i + 1).add(i);
         }
@@ -444,25 +424,22 @@ public class IRBlock {
                         reachPass(reg.getID());
                     }
                 } else if (reg.getType() == 0){
-                    allocPass(i + 1, reg.getID() - 10 + regIDAllocator.size(5));
+                    allocAdjust(reg.getID() - 10 + regIDAllocator.size(5));
                 }
             }
         }
-        // TODO
         graph.work();
         IRReg[] spillRegs = new IRReg[regIDAllocator.size(5)];
-        for (IRLine line : lineList){
-            for (int j = 0; j < line.getRegList().size(); j++){
+        for (IRLine line : lineList) {
+            for (int j = 0; j < line.getRegList().size(); ++j) {
                 IRReg reg = line.getRegList().get(j);
-                if (reg.getType() == 5){
-                    if (graph.getColor(reg.getID()) == -1){
+                if (reg.getType() == 5) {
+                    if (graph.getColor(reg.getID()) == -1) {
                         if (spillRegs[reg.getID()] == null) line.getRegList().set(j, spillRegs[reg.getID()] = regIDAllocator.allocate(12));
                         else line.getRegList().set(j, spillRegs[reg.getID()]);
-                    }else{
-                        line.getRegList().set(j, new IRReg(graph.getColor(reg.getID()), 0, false));
-                    }
+                    } else line.getRegList().set(j, new IRReg(graph.getColor(reg.getID()), 0, false));
                 }else if (reg.getType() == 0 && reg.getID() >= 10){
-                    reg.setID(graph.c[reg.getID()- 10]);
+                    reg.setID(graph.getCs()[reg.getID() - 10]);
                 }
             }
         }
