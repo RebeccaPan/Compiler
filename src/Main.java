@@ -56,8 +56,8 @@ public class Main {
                 blockList.jumpUpdate();
                 blockList.labelOpt();
                 if (debugInfo) { System.out.println("---0"); blockList.print(); }
-                new ConvertImm(blockList).opt();
-                if (debugInfo) { System.out.println("---0.5"); blockList.print(); }
+//                new ConvertImm(blockList).opt();
+//                if (debugInfo) { System.out.println("---0.5"); blockList.print(); }
                 new SSA(blockList).opt();
                 if (debugInfo) { System.out.println("---1"); blockList.print(); }
                 blockList.fulfill();
