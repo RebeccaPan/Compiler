@@ -62,7 +62,7 @@ public class Graph {
 			val[i] = i - (n - cs.length); colored[i] = true;
 		}
 
-		colorChoice = new int [n];
+		colorChoice = new int[n];
 		colorChoiceNum = 0;
 
 		for (int i : savedArr) {
@@ -71,24 +71,23 @@ public class Graph {
 			} else { spillArr.add(i); }
 		}
 
- 		for (int i = 0, head = 0; ; ++i){
-			while (i == colorChoiceNum && head < spillArr.size()){
-				int x = spillArr.get(head++);
-				if (!colored[x] && !spilled[x]){
-					spilled[x] = true;
-					edges.get(x).forEach(y -> {
-						if (!colored[y] && !spilled[y]){
-							if (--deg[y] < color.length - normColor && saved[y]){
-								colorChoice[colorChoiceNum++] = y;
-								colored[y] = true;
+ 		for (int i = 0, top = 0; ; ++i) {
+			while (i == colorChoiceNum && top < spillArr.size()) {
+				int cur = spillArr.get(top++);
+				if (!colored[cur] && !spilled[cur]) {
+					spilled[cur] = true;
+					edges.get(cur).forEach(x -> {
+						if (!colored[x] && !spilled[x]) {
+							if (--deg[x] < color.length - normColor && saved[x]){
+								colorChoice[colorChoiceNum++] = x;
+								colored[x] = true;
 							}
 						}
 					});
 				}
 			}
 			if (i >= colorChoiceNum) break;
-			int v = colorChoice[i];
-			edges.get(v).forEach(x -> {
+			edges.get(colorChoice[i]).forEach(x -> {
 				if (saved[x] && !colored[x] && !spilled[x]){
 					if (--deg[x] < color.length - normColor){
 						colorChoice[colorChoiceNum++] = x;
@@ -101,7 +100,7 @@ public class Graph {
 		for (int i = colorChoiceNum - 1; i >= 0; --i) {
 			int v = colorChoice[i];
 			boolean[] used = new boolean[color.length];
-			for (int j = 0; j < edges.get(v).size(); j++) {
+			for (int j = 0; j < edges.get(v).size(); ++j) {
 				int x = edges.get(v).get(j);
 				if (!spilled[x] && val[x] != -1) used[val[x]] = true;
 			}
@@ -115,50 +114,48 @@ public class Graph {
 		spillArr.clear();
 		for (int i = 0; i < n; ++i){
 			if (!colored[i] && !spilled[i] && deg[i] < color.length) {
-				colorChoice[colorChoiceNum++] = i;
-				colored[i] = true;
+				colorChoice[colorChoiceNum++] = i; colored[i] = true;
 			}
 			spillArr.add(i);
 		}
 		spillArr.sort((Integer a, Integer b) -> Integer.compare(deg[b], deg[a]));
-		int rotate_num = 20;
-		if (spillArr.size() > rotate_num){
-			ArrayList<Integer> new_spill_arr = new ArrayList<>();
-			for (int i = rotate_num; i < spillArr.size(); ++i) new_spill_arr.add(spillArr.get(i));
-			for (int i = 0; i < rotate_num; ++i) new_spill_arr.add(spillArr.get(i));
-			spillArr = new_spill_arr;
+		int rotateNum = 20;
+		if (spillArr.size() > rotateNum){
+			ArrayList<Integer> newSpillArr = new ArrayList<>();
+			for (int i = rotateNum; i < spillArr.size(); ++i) newSpillArr.add(spillArr.get(i));
+			for (int i = 0; i < rotateNum; ++i) newSpillArr.add(spillArr.get(i));
+			spillArr = newSpillArr;
 		}
 		
- 		for (int i = 0, head = 0; ; ++i){
-			while (i == colorChoiceNum && head < spillArr.size()){
-				int x = spillArr.get(head++);
-				if (!colored[x] && !spilled[x]){
-					spilled[x] = true;
-					edges.get(x).forEach(y -> {
-						if (!colored[y] && !spilled[y]){
-							if (--deg[y] < color.length){
-								colorChoice[colorChoiceNum++] = y;
-								colored[y] = true;
+ 		for (int i = 0, head = 0; ; ++i) {
+			while (i == colorChoiceNum && head < spillArr.size()) {
+				int cur = spillArr.get(head++);
+				if (!colored[cur] && !spilled[cur]) {
+					spilled[cur] = true;
+					edges.get(cur).forEach(x -> {
+						if (!colored[x] && !spilled[x]) {
+							if (--deg[x] < color.length) {
+								colorChoice[colorChoiceNum++] = x;
+								colored[x] = true;
 							}
 						}
 					});
 				}
 			}
 			if (i >= colorChoiceNum) break;
-			int v = colorChoice[i];
-			edges.get(v).forEach(x -> {
-				if (!colored[x] && !spilled[x]){
-					if (--deg[x] < color.length){
+			edges.get(colorChoice[i]).forEach(x -> {
+				if (!colored[x] && !spilled[x]) {
+					if (--deg[x] < color.length) {
 						colorChoice[colorChoiceNum++] = x;
 						colored[x] = true;
 					}
 				}
 			});
 		}
-		for (int i = colorChoiceNum - 1; i >= 0; --i){
+		for (int i = colorChoiceNum - 1; i >= 0; --i) {
 			int v = colorChoice[i];
 			boolean[] used = new boolean[color.length];
-			for (int j = 0; j < edges.get(v).size(); j++){
+			for (int j = 0; j < edges.get(v).size(); ++j) {
 				int x = edges.get(v).get(j);
 				if (!spilled[x] && val[x] != -1) used[val[x]] = true;
 			}
