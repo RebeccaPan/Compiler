@@ -58,8 +58,8 @@ public class IRBlock {
         for (int i = 0; i < graph.useSaved(); ++i) {
             subStr += "\tlw\ts" + i + "," + (memRAM - 4*(i+1)) + "(sp)\n";
         }
-        str = (lineList.get(lineList.size() - 1).getOpcode() == LABEL
-            && lineList.get(lineList.size() - 1).getLabel() == retLabel) ? "" : ".b" + index + "l" + retLabel + ":\n"
+        str = ((lineList.get(lineList.size() - 1).getOpcode() == LABEL
+            && lineList.get(lineList.size() - 1).getLabel() == retLabel) ? ("") : (".b" + index + "l" + retLabel + ":\n"))
 //        str = ".LAB" + retLabel + ":\n"
             + subStr
             + ((containCall) ? ("\tlw\tra," + (memRAM - 4*graph.useSaved() - 4) + "(sp)\n") : (""))
