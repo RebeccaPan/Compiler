@@ -37,14 +37,36 @@ public class IRBlockList {
         blockList.forEach(IRBlock::print);
     }
 
-    public void jumpUpdate() { blockList.forEach(x -> x.jumpOpt(maxLabel)); }
+    public void jumpUpdate() { blockList.forEach(x -> x.jumpUpdate(maxLabel)); }
     public void labelOpt() { blockList.forEach(x -> x.labelOpt(maxLabel)); }
     public void fulfill() { blockList.forEach(IRBlock::fulfill); }
+//    public void allocate() { blockList.forEach(IRBlock::allocate); }
     public void graphColor() { blockList.forEach(x -> x.graphColor(maxLabel)); }
     public void fulfillLocal() { blockList.forEach(IRBlock::fulfillLocal); }
     public void allocateLocal() { blockList.forEach(IRBlock::allocateLocal); }
     public void trim() { blockList.forEach(IRBlock::trim); }
     public void calcRAM() { blockList.forEach(IRBlock::calcRAM); }
+
+/*    public void initASM() {
+        System.out.println("---1");
+        print();
+        blockList.forEach(IRBlock::fulfill);
+        System.out.println("---2");
+        print();
+        blockList.forEach(IRBlock::allocate);
+        System.out.println("---3");
+        print();
+        blockList.forEach(IRBlock::fulfillLocal);
+        System.out.println("---4");
+        print();
+        blockList.forEach(IRBlock::allocateLocal);
+        System.out.println("---5");
+        print();
+        blockList.forEach(IRBlock::trim);
+        System.out.println("---6");
+        print();
+        blockList.forEach(IRBlock::calcRAM);
+    }*/
 
     public void printASM() {
         String str = "";

@@ -13,7 +13,7 @@ public class Inline extends Opt {
     public Inline(IRBlockList _curBlockList) { super(_curBlockList); }
 
     int limit = 1; // parameter that can be modified
-    boolean doSelfInline = false;
+    private boolean doSelfInline = false;
     private void init(IRBlock block) {
         for (IRLine line : block.getLineList()) {
             if (line.getOpcode() == IRLine.OPCODE.CALL && line.getLabel() == block.getRetLabel()) {

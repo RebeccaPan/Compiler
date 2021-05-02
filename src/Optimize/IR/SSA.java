@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class SSA extends Opt {
     private int[] times;
+    private boolean[] tempTimes;
     private int cntL;
     private ArrayList<ArrayList<ArrayList<Integer>>> regInfo = new ArrayList<>();
     private IRReg[] newRegs;
@@ -25,7 +26,7 @@ public class SSA extends Opt {
         if (x != y) par[x] = y;
     }
 
-    private void localAdjust(int i, int ID, int loc) {
+    private void local_pass(int i, int ID, int loc) {
         while (i < block.getLineList().size() && times[i] < cntL) {
             times[i] = cntL;
             IRLine line = block.getLineList().get(i);
@@ -42,17 +43,17 @@ public class SSA extends Opt {
                 }
             }
             if (line.getOpcode() == IRLine.OPCODE.JUMP) {
-                i = block.jumpTo[i];
+                i = block.jumpTarget[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    localAdjust(block.jumpTo[i], ID, loc);
+                    local_pass(block.jumpTarget[i], ID, loc);
                 }
                 ++i;
             }
         }
     }
 
-    private void assignAdjust(int i, int ID, int loc) {
+    private void assign_pass(int i, int ID, int loc) {
         while (i < block.getLineList().size() && times[i] < cntL) {
             times[i] = cntL;
             IRLine line = block.getLineList().get(i);
@@ -69,10 +70,10 @@ public class SSA extends Opt {
                 }
             }
             if (line.getOpcode() == IRLine.OPCODE.JUMP) {
-                i = block.jumpTo[i];
+                i = block.jumpTarget[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    assignAdjust(block.jumpTo[i], ID, loc);
+                    assign_pass(block.jumpTarget[i], ID, loc);
                 }
                 ++i;
             }
@@ -87,6 +88,7 @@ public class SSA extends Opt {
         int linesNum = lineList.size();
         // init
         times = new int[linesNum];
+        tempTimes = new boolean[linesNum];
         cntL = 0;
         regInfo = new ArrayList<>();
         newRegs = new IRReg[linesNum];
@@ -103,7 +105,7 @@ public class SSA extends Opt {
             if (line.isDefLine() && line.getRegList().get(0).getType() == 1) {
                 cntL++;
                 newRegs[i] = block.regIDAllocator.allocate(5);
-                localAdjust(i + 1, line.getRegList().get(0).getID(), i);
+                local_pass(i + 1, line.getRegList().get(0).getID(), i);
             }
         }
         for (int i = 0; i < linesNum; ++i) {
@@ -122,7 +124,7 @@ public class SSA extends Opt {
             if (line.isDefLine() && line.getRegList().get(0).getType() == 1) {
                 newRegs[i].assign(newRegs[find(i)]);
                 cntL++;
-                assignAdjust(i + 1, line.getRegList().get(0).getID(), i);
+                assign_pass(i + 1, line.getRegList().get(0).getID(), i);
                 line.getRegList().set(0, newRegs[i]); updated = true;
             }
         }
@@ -132,7 +134,7 @@ public class SSA extends Opt {
     public void opt() {
         updated = false;
         for (IRBlock block : curBlockList.getBlockList()) {
-            block.jumpOpt(curBlockList.getMaxLabel());
+            block.jumpUpdate(curBlockList.getMaxLabel());
             block.labelOpt(curBlockList.getMaxLabel());
             operate(block);
             block.setCntL(cntL);
