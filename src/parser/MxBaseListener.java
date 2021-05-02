@@ -1,4 +1,4 @@
-// Generated from F:/Learning/CS/20-21(2)_Compiler/MyWorkPlace/src/parser\Mx.g4 by ANTLR 4.9
+// Generated from /Users/rebeccapan/Documents/Learning/CS/20-21(2)_Compiler/MyWorkPlace/src/parser/Mx.g4 by ANTLR 4.9.1
 package parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;

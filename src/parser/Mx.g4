@@ -44,7 +44,7 @@ suite: '{' stmt* '}';
 stmt
     : suite                                                             #blockStmt
     | varDef                                                            #varDefStmt
-    | IF '(' expr? ')' (trueStmt=stmt)? (ELSE falseStmt=stmt)?          #ifStmt
+    | IF '(' expr ')' trueStmt=stmt (ELSE falseStmt=stmt)?              #ifStmt
     | FOR '(' (init=expr)? ';' (cond=expr)? ';' (step=expr)? ')' stmt?  #forStmt
     | WHILE '(' expr ')' stmt                                           #whileStmt
     | BREAK ';'                                                         #breakStmt

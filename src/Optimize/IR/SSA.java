@@ -26,7 +26,7 @@ public class SSA extends Opt {
         if (x != y) par[x] = y;
     }
 
-    private void local_pass(int i, int ID, int loc) {
+    private void locAdjust(int i, int ID, int loc) {
         while (i < block.getLineList().size() && times[i] < cntL) {
             times[i] = cntL;
             IRLine line = block.getLineList().get(i);
@@ -46,14 +46,14 @@ public class SSA extends Opt {
                 i = block.jumpTarget[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    local_pass(block.jumpTarget[i], ID, loc);
+                    locAdjust(block.jumpTarget[i], ID, loc);
                 }
                 ++i;
             }
         }
     }
 
-    private void assign_pass(int i, int ID, int loc) {
+    private void assignAdjust(int i, int ID, int loc) {
         while (i < block.getLineList().size() && times[i] < cntL) {
             times[i] = cntL;
             IRLine line = block.getLineList().get(i);
@@ -73,7 +73,7 @@ public class SSA extends Opt {
                 i = block.jumpTarget[i];
             } else {
                 if (line.getOpcode() == IRLine.OPCODE.BEQ || line.getOpcode() == IRLine.OPCODE.BNEQ) {
-                    assign_pass(block.jumpTarget[i], ID, loc);
+                    assignAdjust(block.jumpTarget[i], ID, loc);
                 }
                 ++i;
             }
@@ -105,7 +105,7 @@ public class SSA extends Opt {
             if (line.isDefLine() && line.getRegList().get(0).getType() == 1) {
                 cntL++;
                 newRegs[i] = block.regIDAllocator.allocate(5);
-                local_pass(i + 1, line.getRegList().get(0).getID(), i);
+                locAdjust(i + 1, line.getRegList().get(0).getID(), i);
             }
         }
         for (int i = 0; i < linesNum; ++i) {
@@ -124,7 +124,7 @@ public class SSA extends Opt {
             if (line.isDefLine() && line.getRegList().get(0).getType() == 1) {
                 newRegs[i].assign(newRegs[find(i)]);
                 cntL++;
-                assign_pass(i + 1, line.getRegList().get(0).getID(), i);
+                assignAdjust(i + 1, line.getRegList().get(0).getID(), i);
                 line.getRegList().set(0, newRegs[i]); updated = true;
             }
         }
