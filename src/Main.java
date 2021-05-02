@@ -61,8 +61,8 @@ public class Main {
                 new SSA(blockList).opt();
                 if (debugInfo) { System.out.println("---1"); blockList.print(); }
                 blockList.fulfill();
-                if (debugInfo) { System.out.println("---1.5"); blockList.print(); }
-                new ADCE(blockList).opt();
+//                if (debugInfo) { System.out.println("---1.5"); blockList.print(); }
+//                new ADCE(blockList).opt();
                 if (debugInfo) { System.out.println("---2"); blockList.print(); }
 //                blockList.allocate();
                 blockList.graphColor();

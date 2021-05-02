@@ -14,7 +14,7 @@ import java.util.*;
 public class ADCE extends Opt {
     private boolean[] isActive;
     private int sizeT = 0;
-    private Map<Integer, Set<IRReg>> dependencies = new HashMap<>();
+    private Map<Integer, Set<IRReg>> dependencies = new LinkedHashMap<>();
     private Queue<Integer> queue = new LinkedList<>();
     private boolean[] visited;
 

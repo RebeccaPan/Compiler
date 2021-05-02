@@ -2,6 +2,7 @@ package Util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class Graph {
 
@@ -37,7 +38,7 @@ public class Graph {
 	public int[] val;
 	public void work(){
 		for (int i = 0; i < n; i++){
-			HashSet<Integer> hs = new HashSet<Integer>(to.get(i));
+			HashSet<Integer> hs = new LinkedHashSet<>(to.get(i));
 			to.set(i, new ArrayList<Integer>(hs));
 			/*System.out.print(i + " : ");
 			System.out.println(to.get(i));*/
