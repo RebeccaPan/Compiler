@@ -15,10 +15,10 @@ public class IRBlock {
     private int cntRAM = 0, memRAM = 0, stAddr = 0;
     private int retLabel;
     private int localNum;
-    private int argNum, index;
-    public ArrayList<Pair<String, Integer>> jumpedBy = new ArrayList<>();
-    private int cntL;
+    private int argNum, index, cntL;
 
+    public ArrayList<Pair<String, Integer>> jumpedBy = new ArrayList<>();
+    public int[] jumpTo, labelTo;
     public RegIDAllocator regIDAllocator;
 
     public IRBlock(String _ID, RegIDAllocator _regIDAllocator, int _retLabel) {
@@ -71,18 +71,19 @@ public class IRBlock {
     }
 
     public void jumpOpt(int maxLabel) {
-        int[] used = new int [maxLabel + 1];
+        // count used times of instructions and delete unneeded labels
+        int[] usedTimes = new int [maxLabel + 1];
         ArrayList<IRLine> newLineList = new ArrayList<>();
         for (IRLine line : lineList) {
             switch (line.getOpcode()) {
                 case JUMP, BNEQ, BEQ -> {
-                    used[line.getLabel()]++;
+                    usedTimes[line.getLabel()]++;
                     newLineList.add(line);
                 }
                 case LABEL -> {
                     if (newLineList.get(newLineList.size() - 1).getOpcode() == JUMP
                      && newLineList.get(newLineList.size() - 1).getLabel() == line.getLabel()) {
-                        used[line.getLabel()]--;
+                        usedTimes[line.getLabel()]--;
                         newLineList.remove(newLineList.size() - 1);
                     } else newLineList.add(line);
                 }
@@ -92,13 +93,12 @@ public class IRBlock {
         lineList = newLineList;
         newLineList = new ArrayList<>();
         for (IRLine line : lineList) {
-            if (line.getOpcode() == LABEL && used[line.getLabel()] == 0) continue;
+            if (line.getOpcode() == LABEL && usedTimes[line.getLabel()] == 0) continue;
             newLineList.add(line);
         }
         lineList = newLineList;
     }
 
-    public int[] jumpTo, labelTo;
     public void labelOpt(int maxLabel) {
         jumpTo = new int[lineList.size()];
         labelTo = new int[maxLabel + 1];
@@ -334,13 +334,13 @@ public class IRBlock {
     private void reachPass(int ID) {
         int[] vec = new int[lineList.size()];
         int top = 0;
+        // check all presence of ID
         for (int i = beginT[ID] + 1; i <= endT[ID]; ++i) {
             IRLine line = lineList.get(i);
             for (int j = line.regLoc(); j != -1 && j < line.getRegList().size(); ++j) {
                 IRReg reg = line.getRegList().get(j);
                 if (reg.getType() == 5 && reg.getID() == ID) {
-                    reach[i] = cntL;
-                    vec[top++] = i;
+                    reach[i] = cntL; vec[top++] = i;
                 }
             }
         }
@@ -349,16 +349,13 @@ public class IRBlock {
                 int cur = reachTo.get(vec[i]).get(j);
                 IRLine line = lineList.get(cur);
                 if(reach[cur] < cntL && !(line.isDefLine() && line.getRegList().size() > 0 && line.getRegList().get(0).getType() == 5 && line.getRegList().get(0).getID() == ID)){
-                    reach[cur] = cntL;
-                    vec[top++] = cur;
+                    reach[cur] = cntL; vec[top++] = cur;
                 }
             }
         }
         for (int i = 0; i < top; ++i) {
             IRLine line = lineList.get(vec[i]);
-            if (line.getOpcode() == CALL) {
-                graph.saved[ID] = true;
-            }
+            if (line.getOpcode() == CALL) graph.saved[ID] = true;
             for (int j = line.regLoc(); j != -1 && j < line.getRegList().size(); ++j) {
                 IRReg reg = line.getRegList().get(j);
                 if (reg.getType() == 5)
@@ -376,14 +373,7 @@ public class IRBlock {
             }
         }
     }
-    private void allocAdjust(int ID) {
-        for (IRLine line : lineList) {
-            for (IRReg reg : line.getRegList()) {
-                if (reg.getType() == 5) graph.addEdge(ID, reg.getID());
-            }
-            if (line.getOpcode() == CALL) break;
-        }
-    }
+
     public void graphColor(int maxLabel) {
         labelOpt(maxLabel);
         int linesNum = lineList.size();
@@ -397,34 +387,38 @@ public class IRBlock {
         for (int i = 0; i < linesNum; i++) reachTo.add(new ArrayList<>());
         for (int i = 0; i < linesNum; i++){
             IRLine line = lineList.get(i);
-            if (line.getOpcode() == JUMP || line.getOpcode() == BEQ || line.getOpcode() == BNEQ){
+            if (line.getOpcode() == JUMP || line.getOpcode() == BEQ || line.getOpcode() == BNEQ)
                 reachTo.get(jumpTo[i]).add(i);
-            }
-            if (line.getOpcode() != JUMP && i + 1 < lineList.size()) reachTo.get(i + 1).add(i);
+            if (line.getOpcode() != JUMP && i + 1 < lineList.size())
+                reachTo.get(i + 1).add(i);
         }
 
-        for (int i = 0; i < linesNum; i++){
+        for (int i = 0; i < linesNum; i++) {
             IRLine line = lineList.get(i);
-            for (int j = 0; j < line.getRegList().size(); j++){
-                if (line.getRegList().get(j).getType() == 5){
+            for (int j = 0; j < line.getRegList().size(); j++) {
+                if (line.getRegList().get(j).getType() == 5) {
                     endT[line.getRegList().get(j).getID()] = i;
                 }
             }
         }
-        for (int i = 0; i < linesNum; i++){
+        for (int i = 0; i < linesNum; i++) {
             IRLine line = lineList.get(i);
-//            if (line.ignored) continue;
             if (line.isDefLine()){
                 IRReg reg = line.getRegList().get(0);
                 if (reg.getType() == 5){
-                    if (!flag[reg.getID()]){
+                    if (!flag[reg.getID()]) {
                         flag[reg.getID()] = true;
                         beginT[reg.getID()] = i;
                         cntL++;
                         reachPass(reg.getID());
                     }
-                } else if (reg.getType() == 0){
-                    allocAdjust(reg.getID() - 10 + regIDAllocator.size(5));
+                } else if (reg.getType() == 0) {
+                    for (IRLine tempLine : lineList) {
+                        for (IRReg tempReg : tempLine.getRegList()) {
+                            if (tempReg.getType() == 5) graph.addEdge(reg.getID() - 10 + regIDAllocator.size(5), tempReg.getID());
+                        }
+                        if (tempLine.getOpcode() == CALL) break;
+                    }
                 }
             }
         }
