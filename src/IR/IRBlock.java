@@ -55,6 +55,7 @@ public class IRBlock {
             + ((containCall) ? ("\tsw\tra," + (memRAM - 4*graph.useSaved() - 4) + "(sp)\n") : (""));
         System.out.print(str);
         lineList.forEach(x -> x.printASM(this));
+        subStr = "";
         for (int i = 0; i < graph.useSaved(); ++i) {
             subStr += "\tlw\ts" + i + "," + (memRAM - 4*(i+1)) + "(sp)\n";
         }
