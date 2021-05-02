@@ -22,7 +22,7 @@ public class Main {
         boolean debugInfo = false;
 //        change relative address here:
 //        String filename = "./testcase-2021/optim-new/efficiency.mx";
-//        String filename = "./testcase/codegen/e2.mx";
+//        String filename = "./testcase/codegen/t40.mx";
 //        String filename = "./testcase/codegen/shortest_path/spfa.mx";
         try {
             boolean semantic = false, codegen = false;
@@ -61,8 +61,8 @@ public class Main {
                 new SSA(blockList).opt();
                 if (debugInfo) { System.out.println("---1"); blockList.print(); }
                 blockList.fulfill();
-                if (debugInfo) { System.out.println("---1.5"); blockList.print(); }
-                new ADCE(blockList).opt();
+//                if (debugInfo) { System.out.println("---1.5"); blockList.print(); }
+//                new ADCE(blockList).opt();
                 if (debugInfo) { System.out.println("---2"); blockList.print(); }
 //                blockList.allocate();
                 blockList.graphColor();
