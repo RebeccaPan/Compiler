@@ -25,6 +25,7 @@ public class IRReg {
             case 9 -> "S";
             case 10 -> "Q";
             case 11 -> "C";
+            case 12 -> "Spill";
             default -> ""; // no-print
         };
         System.out.print(typeStr + ID);

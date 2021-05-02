@@ -28,10 +28,10 @@ public class IRBlock {
     public int LAddr(int ID) { return stAddr + (ID + 1) * -4; }
     public int PAddr(int ID) { return ID*4; }
     public void calcRAM() {
-        cntRAM = regIDAllocator.size(1) + regIDAllocator.size(7);
+        cntRAM = regIDAllocator.size(12) + regIDAllocator.size(7) + graph.useSaved();
         stAddr = 0;
         cntRAM++; // s0
-        stAddr -= 4;
+        stAddr -= 4*graph.useSaved();
         if (containCall) {
             cntRAM++; // ra
             stAddr -= 4;
@@ -250,7 +250,7 @@ public class IRBlock {
                             && line.getOpcode() != IRLine.OPCODE.SW) continue;
                         IRReg curReg = line.getRegList().get(j), temp;
                         IRLine curLine;
-                        if (curReg.getType() == 1 && curReg.getID() >= localNum) {
+                        if (curReg.getType() == 12) {
                             temp = regIDAllocator.allocate(5);
                             curLine = new IRLine(IRLine.OPCODE.LW);
                             curLine.addReg(temp);
@@ -268,7 +268,7 @@ public class IRBlock {
                     INDEX, LOAD, LOADSTRING, ADDI, ANDI, SLTI, LW -> {
                     IRReg curReg = line.getRegList().get(0), temp;
                     IRLine curLine;
-                    if (curReg.getType() == 1 && curReg.getID() >= localNum) {
+                    if (curReg.getType() == 12) {
                         temp = regIDAllocator.allocate(5);
                         curLine = new IRLine(IRLine.OPCODE.SW);
                         curLine.getRegList().add(temp);
